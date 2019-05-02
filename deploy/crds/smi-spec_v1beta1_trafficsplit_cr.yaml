@@ -3,5 +3,9 @@ kind: TrafficSplit
 metadata:
   name: example-trafficsplit
 spec:
-  # Add fields here
-  size: 3
+  service: foobar
+  backends:
+  - service: foobar-v1
+    weight: 1
+  - service: foobar-v2
+    weight: 500m
