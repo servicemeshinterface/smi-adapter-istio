@@ -1,15 +1,26 @@
 package v1beta1
 
 import (
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// TrafficSplitBackend defines a backend
+// +k8s:openapi-gen=true
+type TrafficSplitBackend struct {
+	Service string             `json:"service,omitempty"`
+	Weight  *resource.Quantity `json:"weight,omitempty"`
+}
+
 // TrafficSplitSpec defines the desired state of TrafficSplit
 // +k8s:openapi-gen=true
 type TrafficSplitSpec struct {
+	Service  string                `json:"service,omitempty"`
+	Backends []TrafficSplitBackend `json:"backends,omitempty"`
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
