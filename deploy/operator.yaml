@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smi-adapter-istio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: smi-adapter-istio
+  template:
+    metadata:
+      labels:
+        name: smi-adapter-istio
+    spec:
+      serviceAccountName: smi-adapter-istio
+      containers:
+        - name: smi-adapter-istio
+          # Replace this with the built image name
+          image: REPLACE_IMAGE
+          command:
+          - smi-adapter-istio
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "smi-adapter-istio"
