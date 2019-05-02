@@ -3,9 +3,9 @@ package trafficsplit
 import (
 	"context"
 
+	networkingv1alpha3 "github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3"
 	smispecv1beta1 "github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1"
 
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -52,9 +52,16 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// TODO(user): Modify this to be the types you create that are owned by the primary resource
-	// Watch for changes to secondary resource Pods and requeue the owner TrafficSplit
-	err = c.Watch(&source.Kind{Type: &corev1.Pod{}}, &handler.EnqueueRequestForOwner{
+	// Watch for changes to secondary resource VirtualService and DestinationRule
+	err = c.Watch(&source.Kind{Type: &networkingv1alpha3.VirtualService{}}, &handler.EnqueueRequestForOwner{
+		IsController: true,
+		OwnerType:    &smispecv1beta1.TrafficSplit{},
+	})
+	if err != nil {
+		return err
+	}
+
+	err = c.Watch(&source.Kind{Type: &networkingv1alpha3.DestinationRule{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
 		OwnerType:    &smispecv1beta1.TrafficSplit{},
 	})
@@ -100,54 +107,55 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 		return reconcile.Result{}, err
 	}
 
-	// Define a new Pod object
-	pod := newPodForCR(instance)
+	// Define a new VirtualService object
+	vs := newVSForCR(instance)
 
 	// Set TrafficSplit instance as the owner and controller
-	if err := controllerutil.SetControllerReference(instance, pod, r.scheme); err != nil {
+	if err := controllerutil.SetControllerReference(instance, vs, r.scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// Check if this Pod already exists
-	found := &corev1.Pod{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: pod.Name, Namespace: pod.Namespace}, found)
+	// Check if this VS already exists
+	found := &networkingv1alpha3.VirtualService{}
+	err = r.client.Get(context.TODO(), types.NamespacedName{Name: vs.Name, Namespace: vs.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-		err = r.client.Create(context.TODO(), pod)
+		reqLogger.Info("Creating a new VirtualService", "VirtualService.Namespace", vs.Namespace, "VirtualService.Name", vs.Name)
+		err = r.client.Create(context.TODO(), vs)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
 
-		// Pod created successfully - don't requeue
+		// VS created successfully - don't requeue
 		return reconcile.Result{}, nil
 	} else if err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// Pod already exists - don't requeue
-	reqLogger.Info("Skip reconcile: Pod already exists", "Pod.Namespace", found.Namespace, "Pod.Name", found.Name)
+	// VS already exists - don't requeue
+	reqLogger.Info("Skip reconcile: VS already exists", "VirtualService.Namespace", found.Namespace, "VirtualService.Name", found.Name)
 	return reconcile.Result{}, nil
 }
 
-// newPodForCR returns a busybox pod with the same name/namespace as the cr
-func newPodForCR(cr *smispecv1beta1.TrafficSplit) *corev1.Pod {
+// newVSForCR returns a VirtualService with the same name/namespace as the cr
+func newVSForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.VirtualService {
 	labels := map[string]string{
-		"app": cr.Name,
+		"traffic-split": cr.Name,
 	}
-	return &corev1.Pod{
+	return &networkingv1alpha3.VirtualService{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-pod",
+			Name:      cr.Name + "-vs",
 			Namespace: cr.Namespace,
 			Labels:    labels,
 		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name:    "busybox",
-					Image:   "busybox",
-					Command: []string{"sleep", "3600"},
+		Spec: networkingv1alpha3.VirtualServiceSpec{
+			Hosts: []string{"myfoobarservice"},
+			Http: []*networkingv1alpha3.HTTPRoute{&networkingv1alpha3.HTTPRoute{
+				Route: []*networkingv1alpha3.HTTPRouteDestination{&networkingv1alpha3.HTTPRouteDestination{
+					Destination: &networkingv1alpha3.Destination{Host: "foo.com"},
+					Weight:      42,
 				},
-			},
+				},
+			}},
 		},
 	}
 }
