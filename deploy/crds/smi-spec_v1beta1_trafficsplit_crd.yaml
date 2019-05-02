@@ -3,6 +3,11 @@ kind: CustomResourceDefinition
 metadata:
   name: trafficsplits.smi-spec.io
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.service
+    description: The service
+    name: Service
+    type: string
   group: smi-spec.io
   names:
     kind: TrafficSplit
