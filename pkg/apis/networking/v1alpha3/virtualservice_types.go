@@ -7,12 +7,33 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// +k8s:openapi-gen=true
+type Destination struct {
+	Host   string `json:"host,omitempty"`
+	Subset string `json:"subset,omitempty"`
+}
+
+// +k8s:openapi-gen=true
+type HTTPRouteDestination struct {
+	Destination *Destination `protobuf:"bytes,1,opt,name=destination,proto3" json:"destination,omitempty"`
+	Weight      int32        `protobuf:"varint,2,opt,name=weight,proto3" json:"weight,omitempty"`
+}
+
+// Describes match conditions and actions for routing HTTP/1.1, HTTP2, and
+// gRPC traffic. See VirtualService for usage examples.
+// +k8s:openapi-gen=true
+type HTTPRoute struct {
+	Route []*HTTPRouteDestination `json:"route,omitempty"`
+}
+
 // VirtualServiceSpec defines the desired state of VirtualService
 // +k8s:openapi-gen=true
 type VirtualServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
+	Hosts []string     `json:"hosts,omitempty"`
+	Http  []*HTTPRoute `json:"http,omitempty"`
 }
 
 // VirtualServiceStatus defines the observed state of VirtualService
