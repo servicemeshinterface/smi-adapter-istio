@@ -13,9 +13,9 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplit":       schema_pkg_apis_smispec_v1beta1_TrafficSplit(ref),
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitSpec":   schema_pkg_apis_smispec_v1beta1_TrafficSplitSpec(ref),
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitStatus": schema_pkg_apis_smispec_v1beta1_TrafficSplitStatus(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplit":       schema_pkg_apis_smispec_v1beta1_TrafficSplit(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitSpec":   schema_pkg_apis_smispec_v1beta1_TrafficSplitSpec(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitStatus": schema_pkg_apis_smispec_v1beta1_TrafficSplitStatus(ref),
 	}
 }
 
@@ -46,19 +46,19 @@ func schema_pkg_apis_smispec_v1beta1_TrafficSplit(ref common.ReferenceCallback) 
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitSpec"),
+							Ref: ref("github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitStatus"),
+							Ref: ref("github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitSpec", "github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitSpec", "github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1.TrafficSplitStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

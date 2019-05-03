@@ -13,12 +13,12 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRule":       schema_pkg_apis_networking_v1alpha3_DestinationRule(ref),
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleSpec":   schema_pkg_apis_networking_v1alpha3_DestinationRuleSpec(ref),
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleStatus": schema_pkg_apis_networking_v1alpha3_DestinationRuleStatus(ref),
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualService":        schema_pkg_apis_networking_v1alpha3_VirtualService(ref),
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceSpec":    schema_pkg_apis_networking_v1alpha3_VirtualServiceSpec(ref),
-		"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceStatus":  schema_pkg_apis_networking_v1alpha3_VirtualServiceStatus(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRule":       schema_pkg_apis_networking_v1alpha3_DestinationRule(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleSpec":   schema_pkg_apis_networking_v1alpha3_DestinationRuleSpec(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleStatus": schema_pkg_apis_networking_v1alpha3_DestinationRuleStatus(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualService":        schema_pkg_apis_networking_v1alpha3_VirtualService(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceSpec":    schema_pkg_apis_networking_v1alpha3_VirtualServiceSpec(ref),
+		"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceStatus":  schema_pkg_apis_networking_v1alpha3_VirtualServiceStatus(ref),
 	}
 }
 
@@ -49,19 +49,19 @@ func schema_pkg_apis_networking_v1alpha3_DestinationRule(ref common.ReferenceCal
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleSpec"),
+							Ref: ref("github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleStatus"),
+							Ref: ref("github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleSpec", "github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleSpec", "github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.DestinationRuleStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -116,19 +116,19 @@ func schema_pkg_apis_networking_v1alpha3_VirtualService(ref common.ReferenceCall
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceSpec"),
+							Ref: ref("github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceStatus"),
+							Ref: ref("github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceSpec", "github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceSpec", "github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3.VirtualServiceStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

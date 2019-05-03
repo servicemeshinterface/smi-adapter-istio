@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/kinvolk/smi-adapter-istio/pkg/controller/trafficsplit"
+	"github.com/deislabs/smi-adapter-istio/pkg/controller/trafficsplit"
 )
 
 func init() {

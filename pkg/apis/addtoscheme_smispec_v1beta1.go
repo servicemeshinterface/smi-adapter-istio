@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1"
+	"github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1"
 )
 
 func init() {

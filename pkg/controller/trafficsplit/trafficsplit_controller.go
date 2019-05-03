@@ -3,8 +3,8 @@ package trafficsplit
 import (
 	"context"
 
-	networkingv1alpha3 "github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3"
-	smispecv1beta1 "github.com/kinvolk/smi-adapter-istio/pkg/apis/smispec/v1beta1"
+	networkingv1alpha3 "github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3"
+	smispecv1beta1 "github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

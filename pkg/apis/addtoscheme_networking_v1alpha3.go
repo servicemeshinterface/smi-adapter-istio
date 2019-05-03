@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"github.com/kinvolk/smi-adapter-istio/pkg/apis/networking/v1alpha3"
+	"github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3"
 )
 
 func init() {

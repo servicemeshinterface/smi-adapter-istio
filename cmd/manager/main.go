@@ -10,8 +10,8 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	"github.com/kinvolk/smi-adapter-istio/pkg/apis"
-	"github.com/kinvolk/smi-adapter-istio/pkg/controller"
+	"github.com/deislabs/smi-adapter-istio/pkg/apis"
+	"github.com/deislabs/smi-adapter-istio/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
