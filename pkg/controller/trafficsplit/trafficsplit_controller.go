@@ -101,9 +101,11 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
+			reqLogger.Info("TrafficSplit object not found.")
 			return reconcile.Result{}, nil
 		}
 		// Error reading the object - requeue the request.
+		reqLogger.Error(err, "Failed to get TrafficSplit.")
 		return reconcile.Result{}, err
 	}
 
@@ -128,11 +130,39 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 		// VS created successfully - don't requeue
 		return reconcile.Result{}, nil
 	} else if err != nil {
+		reqLogger.Error(err, "Failed to get VirtualService.")
 		return reconcile.Result{}, err
 	}
 
 	// VS already exists - don't requeue
 	reqLogger.Info("Skip reconcile: VS already exists", "VirtualService.Namespace", found.Namespace, "VirtualService.Name", found.Name)
+
+	// Define a new DestinationRule object
+	dr := newDestinationRuleForCR(instance)
+
+	// Set DestinationRule instance as the owner and controller
+	if err := controllerutil.SetControllerReference(instance, dr, r.scheme); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	// Check if this DR already exists
+	foundDestinationRule := &networkingv1alpha3.DestinationRule{}
+	err = r.client.Get(context.TODO(), types.NamespacedName{Name: dr.Name, Namespace: dr.Namespace}, foundDestinationRule)
+	if err != nil && errors.IsNotFound(err) {
+		reqLogger.Info("Creating a new DestinationRule", "DestinationRule.Namespace", dr.Namespace, "DestinationRule.Name", dr.Name)
+		err = r.client.Create(context.TODO(), dr)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+
+		// DestinationRule creaed successfully - don't requeue
+		return reconcile.Result{}, nil
+	} else if err != nil {
+		reqLogger.Error(err, "Failed to get DestinationRule.")
+		return reconcile.Result{}, err
+	}
+	// DR already exists - don't requeue
+	reqLogger.Info("Skip reconcile: Destination Rule already exists", "DestinationRule.Namespace", foundDestinationRule.Namespace, "DestinationRule.Name", dr.Name)
 	return reconcile.Result{}, nil
 }
 
@@ -148,19 +178,49 @@ func newVSForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.VirtualServ
 			Labels:    labels,
 		},
 		Spec: networkingv1alpha3.VirtualServiceSpec{
-			Hosts: []string{cr.Spec.Service},
-			Http: []*networkingv1alpha3.HTTPRoute{
-				&networkingv1alpha3.HTTPRoute{
-					Route: []*networkingv1alpha3.HTTPRouteDestination{&networkingv1alpha3.HTTPRouteDestination{
-						Destination: &networkingv1alpha3.Destination{Host: "hardcoded1.example.com"},
-						Weight:      42,
-					}},
+			Hosts: []string{"myfoobarservice"},
+			Http: []*networkingv1alpha3.HTTPRoute{{
+				Route: []*networkingv1alpha3.HTTPRouteDestination{{
+					Destination: &networkingv1alpha3.Destination{Host: "foo.com"},
+					Weight:      42,
 				},
-				&networkingv1alpha3.HTTPRoute{
-					Route: []*networkingv1alpha3.HTTPRouteDestination{&networkingv1alpha3.HTTPRouteDestination{
-						Destination: &networkingv1alpha3.Destination{Host: "hardcoded2.example.com"},
-						Weight:      43,
-					}},
+				},
+			}},
+		},
+	}
+}
+
+// newDestinationRuleForCR returns DestinationRule with the same name & namespace as of the
+// Custom Resource
+func newDestinationRuleForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.DestinationRule {
+	labels := map[string]string{
+		"traffic-split": cr.Name,
+	}
+	return &networkingv1alpha3.DestinationRule{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cr.Name + "-dr",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Spec: networkingv1alpha3.DestinationRuleSpec{
+			Host: cr.Spec.Service,
+			TrafficPolicy: &networkingv1alpha3.TrafficPolicy{
+				Tls: &networkingv1alpha3.TLSSettings{
+					Mode: "ISTIO_MUTUAL",
+				},
+			},
+			Subsets: []*networkingv1alpha3.Subset{
+				{
+					Name: "v1",
+					Labels: map[string]string{
+						"version": "v1",
+					},
+				},
+				{
+					Name: "v2",
+					Labels: map[string]string{
+						"version": "v2",
+					},
 				},
 			},
 		},
