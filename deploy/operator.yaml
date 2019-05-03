@@ -15,7 +15,7 @@ spec:
       serviceAccountName: smi-adapter-istio
       containers:
         - name: smi-adapter-istio
-          image: docker.io/albanc/fili
+          image: OPERATOR_IMAGE
           command:
           - smi-adapter-istio
           imagePullPolicy: Always
