@@ -1,4 +1,4 @@
-apiVersion: smi-spec.io/v1beta1
+apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
 metadata:
   name: example-trafficsplit

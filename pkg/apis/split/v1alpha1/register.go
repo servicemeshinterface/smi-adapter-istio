@@ -1,9 +1,9 @@
 // NOTE: Boilerplate only.  Ignore this file.
 
-// Package v1beta1 contains API Schema definitions for the smi-spec v1beta1 API group
+// Package v1alpha1 contains API Schema definitions for the split v1alpha1 API group
 // +k8s:deepcopy-gen=package,register
-// +groupName=smi-spec.io
-package v1beta1
+// +groupName=split.smi-spec.io
+package v1alpha1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -12,7 +12,7 @@ import (
 
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: "smi-spec.io", Version: "v1beta1"}
+	SchemeGroupVersion = schema.GroupVersion{Group: "split.smi-spec.io", Version: "v1alpha1"}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = &scheme.Builder{GroupVersion: SchemeGroupVersion}
