@@ -201,14 +201,21 @@ func newVSForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.VirtualServ
 			Labels:    labels,
 		},
 		Spec: networkingv1alpha3.VirtualServiceSpec{
-			Hosts: []string{"myfoobarservice"},
-			Http: []*networkingv1alpha3.HTTPRoute{{
-				Route: []*networkingv1alpha3.HTTPRouteDestination{{
-					Destination: &networkingv1alpha3.Destination{Host: "foo.com"},
-					Weight:      42,
+			Hosts: []string{cr.Spec.Service},
+			Http: []*networkingv1alpha3.HTTPRoute{
+				&networkingv1alpha3.HTTPRoute{
+					Route: []*networkingv1alpha3.HTTPRouteDestination{&networkingv1alpha3.HTTPRouteDestination{
+						Destination: &networkingv1alpha3.Destination{Host: "hardcoded1.example.com"},
+						Weight:      42,
+					}},
 				},
+				&networkingv1alpha3.HTTPRoute{
+					Route: []*networkingv1alpha3.HTTPRouteDestination{&networkingv1alpha3.HTTPRouteDestination{
+						Destination: &networkingv1alpha3.Destination{Host: "hardcoded2.example.com"},
+						Weight:      43,
+					}},
 				},
-			}},
+			},
 		},
 	}
 }
