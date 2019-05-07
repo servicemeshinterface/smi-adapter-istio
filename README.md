@@ -24,3 +24,51 @@ kubectl create -f deploy/role.yaml
 kubectl create -f deploy/role_binding.yaml
 cat deploy/operator.yaml | sed "s,OPERATOR_IMAGE,$OPERATOR_IMAGE,g" | kubectl create -f -
 ```
+
+## Developer setup
+
+#### Prerequisites
+
+- Minikube machine with atleast `4GB` memory.
+- `operator-sdk` installed, download from [here](https://github.com/operator-framework/operator-sdk/releases).
+
+#### Download Istio
+
+Follow [instructions in istio documentation](https://istio.io/docs/setup/kubernetes/download/#download-and-prepare-for-the-installation) to download istio.
+
+#### Install Istio
+
+Once you are the root of the downloaded directory. Run following command to install Istio.
+
+```bash
+kubectl apply -f install/kubernetes/istio-demo-auth.yaml
+```
+
+Verify the istio is running fine as mentioned [here](https://istio.io/docs/setup/kubernetes/install/kubernetes/#verifying-the-installation).
+
+#### Now build the operator image
+
+```bash
+eval $(minikube docker-env)
+operator-sdk build devimage
+```
+
+By exporting all the minikube docker environment variables locally the build happens in the virtual machine directly.
+
+#### Deploy the operator and related configs
+
+```bash
+sed -i 's|OPERATOR_IMAGE|devimage|g' deploy/operator.yaml
+sed -i 's|imagePullPolicy: Always|imagePullPolicy: Never|g' deploy/operator.yaml
+kubectl apply -R -f deploy/
+```
+
+#### To rebuild and redeploy
+
+After making changes to the code run following commands
+
+```bash
+eval $(minikube docker-env)
+operator-sdk build devimage
+kubectl delete pod -l 'name=smi-adapter-istio'
+```
