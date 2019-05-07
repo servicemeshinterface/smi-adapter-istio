@@ -12,3 +12,10 @@ check-env:
 ifndef OPERATOR_IMAGE
 	$(error Environment variable OPERATOR_IMAGE is undefined)
 endif
+
+GOFORMAT_FILES := $(shell find . -name '*.go' | grep -v '\./vendor/')
+
+.PHONY: format-go-code
+## Formats any go file that differs from gofmt's style
+format-go-code:
+	@gofmt -s -l -w ${GOFORMAT_FILES}

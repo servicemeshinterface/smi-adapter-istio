@@ -6,6 +6,7 @@ import (
 	networkingv1alpha3 "github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3"
 	smispecv1beta1 "github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1"
 
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -94,45 +95,97 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 	reqLogger.Info("Reconciling TrafficSplit")
 
 	// Fetch the TrafficSplit instance
-	instance := &smispecv1beta1.TrafficSplit{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
+	trafficSplit := &smispecv1beta1.TrafficSplit{}
+	err := r.client.Get(context.TODO(), request.NamespacedName, trafficSplit)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
+			reqLogger.Info("TrafficSplit object not found.")
 			return reconcile.Result{}, nil
 		}
 		// Error reading the object - requeue the request.
+		reqLogger.Error(err, "Failed to get TrafficSplit. Request will be requeued.")
 		return reconcile.Result{}, err
 	}
 
+	reconcileResultVS, errVS := r.reconcileVirtualService(trafficSplit, reqLogger)
+	reconcileResultDR, errDR := r.reconcileDestinationRule(trafficSplit, reqLogger)
+	if errVS != nil {
+		return reconcileResultVS, errVS
+	}
+	if errDR != nil {
+		return reconcileResultDR, errDR
+	}
+
+	return reconcile.Result{}, nil
+}
+
+func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *smispecv1beta1.TrafficSplit,
+	reqLogger logr.Logger) (reconcile.Result, error) {
 	// Define a new VirtualService object
-	vs := newVSForCR(instance)
+	vs := newVSForCR(trafficSplit)
 
 	// Set TrafficSplit instance as the owner and controller
-	if err := controllerutil.SetControllerReference(instance, vs, r.scheme); err != nil {
+	if err := controllerutil.SetControllerReference(trafficSplit, vs, r.scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	// Check if this VS already exists
 	found := &networkingv1alpha3.VirtualService{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: vs.Name, Namespace: vs.Namespace}, found)
+	err := r.client.Get(context.TODO(), types.NamespacedName{Name: vs.Name, Namespace: vs.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new VirtualService", "VirtualService.Namespace", vs.Namespace, "VirtualService.Name", vs.Name)
+		reqLogger.Info("Creating a new VirtualService", "VirtualService.Namespace", vs.Namespace,
+			"VirtualService.Name", vs.Name)
 		err = r.client.Create(context.TODO(), vs)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
 
-		// VS created successfully - don't requeue
+		// VirtualService created successfully - don't requeue
 		return reconcile.Result{}, nil
 	} else if err != nil {
+		reqLogger.Error(err, "Failed to get VirtualService.")
 		return reconcile.Result{}, err
 	}
 
 	// VS already exists - don't requeue
-	reqLogger.Info("Skip reconcile: VS already exists", "VirtualService.Namespace", found.Namespace, "VirtualService.Name", found.Name)
+	reqLogger.Info("Skip reconcile: VirtualService already exists", "VirtualService.Namespace", found.Namespace,
+		"VirtualService.Name", found.Name)
+	return reconcile.Result{}, nil
+}
+
+func (r *ReconcileTrafficSplit) reconcileDestinationRule(trafficSplit *smispecv1beta1.TrafficSplit,
+	reqLogger logr.Logger) (reconcile.Result, error) {
+	// Define a new DestinationRule object
+	dr := newDestinationRuleForCR(trafficSplit)
+
+	// Set TrafficSplit instance as the owner and controller
+	if err := controllerutil.SetControllerReference(trafficSplit, dr, r.scheme); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	// Check if this DR already exists
+	found := &networkingv1alpha3.DestinationRule{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{Name: dr.Name, Namespace: dr.Namespace}, found)
+	if err != nil && errors.IsNotFound(err) {
+		reqLogger.Info("Creating a new DestinationRule", "DestinationRule.Namespace", dr.Namespace,
+			"DestinationRule.Name", dr.Name)
+		err = r.client.Create(context.TODO(), dr)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+
+		// DestinationRule created successfully - don't requeue
+		return reconcile.Result{}, nil
+	} else if err != nil {
+		reqLogger.Error(err, "Failed to get DestinationRule.")
+		return reconcile.Result{}, err
+	}
+	// DR already exists - don't requeue
+	reqLogger.Info("Skip reconcile: DestinationRule already exists", "DestinationRule.Namespace", found.Namespace,
+		"DestinationRule.Name", dr.Name)
 	return reconcile.Result{}, nil
 }
 
@@ -161,6 +214,43 @@ func newVSForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.VirtualServ
 						Destination: &networkingv1alpha3.Destination{Host: "hardcoded2.example.com"},
 						Weight:      43,
 					}},
+				},
+			},
+		},
+	}
+}
+
+// newDestinationRuleForCR returns DestinationRule with the same name & namespace as of the
+// Custom Resource
+func newDestinationRuleForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.DestinationRule {
+	labels := map[string]string{
+		"traffic-split": cr.Name,
+	}
+	return &networkingv1alpha3.DestinationRule{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cr.Name + "-dr",
+			Namespace: cr.Namespace,
+			Labels:    labels,
+		},
+		Spec: networkingv1alpha3.DestinationRuleSpec{
+			Host: cr.Spec.Service,
+			TrafficPolicy: &networkingv1alpha3.TrafficPolicy{
+				Tls: &networkingv1alpha3.TLSSettings{
+					Mode: "ISTIO_MUTUAL",
+				},
+			},
+			Subsets: []*networkingv1alpha3.Subset{
+				{
+					Name: "v1",
+					Labels: map[string]string{
+						"version": "v1",
+					},
+				},
+				{
+					Name: "v2",
+					Labels: map[string]string{
+						"version": "v2",
+					},
 				},
 			},
 		},
