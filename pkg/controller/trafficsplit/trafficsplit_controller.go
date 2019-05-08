@@ -7,6 +7,7 @@ import (
 	splitv1alpha1 "github.com/deislabs/smi-adapter-istio/pkg/apis/split/v1alpha1"
 
 	"github.com/go-logr/logr"
+	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -22,11 +23,6 @@ import (
 )
 
 var log = logf.Log.WithName("controller_trafficsplit")
-
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
 
 // Add creates a new TrafficSplit Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
@@ -85,8 +81,6 @@ type ReconcileTrafficSplit struct {
 
 // Reconcile reads that state of the cluster for a TrafficSplit object and makes changes based on the state read
 // and what is in the TrafficSplit.Spec
-// TODO(user): Modify this Reconcile function to implement your Controller logic.  This example creates
-// a Pod as an example
 // Note:
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
@@ -135,6 +129,8 @@ func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alp
 	// Check if this VS already exists
 	found := &networkingv1alpha3.VirtualService{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{Name: vs.Name, Namespace: vs.Namespace}, found)
+
+	// Create VS
 	if err != nil && errors.IsNotFound(err) {
 		reqLogger.Info("Creating a new VirtualService", "VirtualService.Namespace", vs.Namespace,
 			"VirtualService.Name", vs.Name)
@@ -146,18 +142,31 @@ func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alp
 		// VirtualService created successfully - don't requeue
 		return reconcile.Result{}, nil
 	} else if err != nil {
-		reqLogger.Error(err, "Failed to get VirtualService.")
+		reqLogger.Error(err, "Failed to get VirtualService.", "VirtualService.Namespace", vs.Namespace,
+			"VirtualService.Name", vs.Name)
 		return reconcile.Result{}, err
 	}
 
-	// VS already exists - don't requeue
-	reqLogger.Info("Skip reconcile: VirtualService already exists", "VirtualService.Namespace", found.Namespace,
-		"VirtualService.Name", found.Name)
+	// Update VS
+	if diff := cmp.Diff(vs.Spec, found.Spec); diff != "" {
+		reqLogger.Info("Updating VirtualService", "VirtualService.Namespace", vs.Namespace,
+			"VirtualService.Name", vs.Name)
+		clone := found.DeepCopy()
+		clone.Spec = vs.Spec
+		err = r.client.Update(context.TODO(), clone)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+	}
+
 	return reconcile.Result{}, nil
 }
 
 func (r *ReconcileTrafficSplit) reconcileDestinationRule(trafficSplit *splitv1alpha1.TrafficSplit,
 	reqLogger logr.Logger) (reconcile.Result, error) {
+	//disable for now
+	return reconcile.Result{}, nil
+
 	// Define a new DestinationRule object
 	dr := newDestinationRuleForCR(trafficSplit)
 
@@ -194,26 +203,32 @@ func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualServi
 	labels := map[string]string{
 		"traffic-split": cr.Name,
 	}
+
+	var backends []*networkingv1alpha3.HTTPRouteDestination
+
+	for _, b := range cr.Spec.Backends {
+		weight, _ := b.Weight.AsInt64()
+		r := &networkingv1alpha3.HTTPRouteDestination{
+			Destination: &networkingv1alpha3.Destination{Host: b.Service},
+			Weight:      int32(weight),
+		}
+
+		backends = append(backends, r)
+	}
+
 	return &networkingv1alpha3.VirtualService{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cr.Name + "-vs",
 			Namespace: cr.Namespace,
 			Labels:    labels,
 		},
+
 		Spec: networkingv1alpha3.VirtualServiceSpec{
 			Hosts: []string{cr.Spec.Service},
+
 			Http: []*networkingv1alpha3.HTTPRoute{
-				&networkingv1alpha3.HTTPRoute{
-					Route: []*networkingv1alpha3.HTTPRouteDestination{&networkingv1alpha3.HTTPRouteDestination{
-						Destination: &networkingv1alpha3.Destination{Host: "hardcoded1.example.com"},
-						Weight:      42,
-					}},
-				},
-				&networkingv1alpha3.HTTPRoute{
-					Route: []*networkingv1alpha3.HTTPRouteDestination{&networkingv1alpha3.HTTPRouteDestination{
-						Destination: &networkingv1alpha3.Destination{Host: "hardcoded2.example.com"},
-						Weight:      43,
-					}},
+				{
+					Route: backends,
 				},
 			},
 		},
