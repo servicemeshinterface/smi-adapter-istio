@@ -4,7 +4,7 @@ import (
 	"context"
 
 	networkingv1alpha3 "github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3"
-	smispecv1beta1 "github.com/deislabs/smi-adapter-istio/pkg/apis/smispec/v1beta1"
+	splitv1alpha1 "github.com/deislabs/smi-adapter-istio/pkg/apis/split/v1alpha1"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -48,7 +48,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to primary resource TrafficSplit
-	err = c.Watch(&source.Kind{Type: &smispecv1beta1.TrafficSplit{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &splitv1alpha1.TrafficSplit{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource VirtualService and DestinationRule
 	err = c.Watch(&source.Kind{Type: &networkingv1alpha3.VirtualService{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &smispecv1beta1.TrafficSplit{},
+		OwnerType:    &splitv1alpha1.TrafficSplit{},
 	})
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 
 	err = c.Watch(&source.Kind{Type: &networkingv1alpha3.DestinationRule{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &smispecv1beta1.TrafficSplit{},
+		OwnerType:    &splitv1alpha1.TrafficSplit{},
 	})
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 	reqLogger.Info("Reconciling TrafficSplit")
 
 	// Fetch the TrafficSplit instance
-	trafficSplit := &smispecv1beta1.TrafficSplit{}
+	trafficSplit := &splitv1alpha1.TrafficSplit{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, trafficSplit)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -122,7 +122,7 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 	return reconcile.Result{}, nil
 }
 
-func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *smispecv1beta1.TrafficSplit,
+func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alpha1.TrafficSplit,
 	reqLogger logr.Logger) (reconcile.Result, error) {
 	// Define a new VirtualService object
 	vs := newVSForCR(trafficSplit)
@@ -156,7 +156,7 @@ func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *smispecv1b
 	return reconcile.Result{}, nil
 }
 
-func (r *ReconcileTrafficSplit) reconcileDestinationRule(trafficSplit *smispecv1beta1.TrafficSplit,
+func (r *ReconcileTrafficSplit) reconcileDestinationRule(trafficSplit *splitv1alpha1.TrafficSplit,
 	reqLogger logr.Logger) (reconcile.Result, error) {
 	// Define a new DestinationRule object
 	dr := newDestinationRuleForCR(trafficSplit)
@@ -190,7 +190,7 @@ func (r *ReconcileTrafficSplit) reconcileDestinationRule(trafficSplit *smispecv1
 }
 
 // newVSForCR returns a VirtualService with the same name/namespace as the cr
-func newVSForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.VirtualService {
+func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualService {
 	labels := map[string]string{
 		"traffic-split": cr.Name,
 	}
@@ -222,7 +222,7 @@ func newVSForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.VirtualServ
 
 // newDestinationRuleForCR returns DestinationRule with the same name & namespace as of the
 // Custom Resource
-func newDestinationRuleForCR(cr *smispecv1beta1.TrafficSplit) *networkingv1alpha3.DestinationRule {
+func newDestinationRuleForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.DestinationRule {
 	labels := map[string]string{
 		"traffic-split": cr.Name,
 	}

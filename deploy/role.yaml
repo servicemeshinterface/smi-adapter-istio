@@ -41,7 +41,7 @@ rules:
   verbs:
   - update
 - apiGroups:
-  - smi-spec.io
+  - split.smi-spec.io
   resources:
   - '*'
   verbs:
