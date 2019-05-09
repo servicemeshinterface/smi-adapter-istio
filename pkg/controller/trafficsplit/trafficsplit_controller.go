@@ -2,6 +2,8 @@ package trafficsplit
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
 	networkingv1alpha3 "github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3"
 	splitv1alpha1 "github.com/deislabs/smi-adapter-istio/pkg/apis/split/v1alpha1"
@@ -9,6 +11,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -198,6 +201,48 @@ func (r *ReconcileTrafficSplit) reconcileDestinationRule(trafficSplit *splitv1al
 	return reconcile.Result{}, nil
 }
 
+func quantityToKilo(q resource.Quantity) int {
+	// TODO: reuse existing resource.Quantity methods to get the amount
+	numberBytes, suffixBytes := q.CanonicalizeBytes(make([]byte, 18, 18))
+	number := strings.Trim(string(numberBytes), "\000")
+	suffix := strings.Trim(string(suffixBytes), "\000")
+	out, _ := strconv.Atoi(number)
+	if suffix == "m" {
+		return out
+	} else if suffix == "" {
+		return out * 1000
+	} else {
+		return 0
+	}
+}
+
+func getIstioBackendPercentage(cr *splitv1alpha1.TrafficSplit, index int) int {
+	var totalWeight int
+	for _, b := range cr.Spec.Backends {
+		totalWeight += quantityToKilo(*b.Weight)
+	}
+	if totalWeight == 0 {
+		return 0
+	}
+	var totalPercentage int
+	for i, b := range cr.Spec.Backends {
+		percentage := int(quantityToKilo(*b.Weight) * 100 / totalWeight)
+
+		// Make sure to round it correctly if we go over 100% or if we
+		// didn't reach 100% at the last entry.
+		if totalPercentage+percentage > 100 || i == len(cr.Spec.Backends)-1 {
+			percentage = 100 - totalPercentage
+		}
+
+		if i == index {
+			return percentage
+		}
+
+		totalPercentage += percentage
+	}
+	return 0
+}
+
 // newVSForCR returns a VirtualService with the same name/namespace as the cr
 func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualService {
 	labels := map[string]string{
@@ -206,11 +251,10 @@ func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualServi
 
 	var backends []*networkingv1alpha3.HTTPRouteDestination
 
-	for _, b := range cr.Spec.Backends {
-		weight, _ := b.Weight.AsInt64()
+	for i, b := range cr.Spec.Backends {
 		r := &networkingv1alpha3.HTTPRouteDestination{
 			Destination: &networkingv1alpha3.Destination{Host: b.Service},
-			Weight:      int32(weight),
+			Weight:      int32(getIstioBackendPercentage(cr, i)),
 		}
 
 		backends = append(backends, r)
