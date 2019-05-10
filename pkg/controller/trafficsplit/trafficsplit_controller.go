@@ -52,24 +52,11 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// Watch for changes to secondary resource VirtualService and DestinationRule
-	err = c.Watch(&source.Kind{Type: &networkingv1alpha3.VirtualService{}}, &handler.EnqueueRequestForOwner{
+	// Watch for changes to secondary resource VirtualService
+	return c.Watch(&source.Kind{Type: &networkingv1alpha3.VirtualService{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
 		OwnerType:    &splitv1alpha1.TrafficSplit{},
 	})
-	if err != nil {
-		return err
-	}
-
-	err = c.Watch(&source.Kind{Type: &networkingv1alpha3.DestinationRule{}}, &handler.EnqueueRequestForOwner{
-		IsController: true,
-		OwnerType:    &splitv1alpha1.TrafficSplit{},
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 var _ reconcile.Reconciler = &ReconcileTrafficSplit{}
@@ -107,16 +94,7 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 		return reconcile.Result{}, err
 	}
 
-	reconcileResultVS, errVS := r.reconcileVirtualService(trafficSplit, reqLogger)
-	reconcileResultDR, errDR := r.reconcileDestinationRule(trafficSplit, reqLogger)
-	if errVS != nil {
-		return reconcileResultVS, errVS
-	}
-	if errDR != nil {
-		return reconcileResultDR, errDR
-	}
-
-	return reconcile.Result{}, nil
+	return r.reconcileVirtualService(trafficSplit, reqLogger)
 }
 
 func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alpha1.TrafficSplit,
@@ -162,42 +140,6 @@ func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alp
 		}
 	}
 
-	return reconcile.Result{}, nil
-}
-
-func (r *ReconcileTrafficSplit) reconcileDestinationRule(trafficSplit *splitv1alpha1.TrafficSplit,
-	reqLogger logr.Logger) (reconcile.Result, error) {
-	//disable for now
-	return reconcile.Result{}, nil
-
-	// Define a new DestinationRule object
-	dr := newDestinationRuleForCR(trafficSplit)
-
-	// Set TrafficSplit instance as the owner and controller
-	if err := controllerutil.SetControllerReference(trafficSplit, dr, r.scheme); err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Check if this DR already exists
-	found := &networkingv1alpha3.DestinationRule{}
-	err := r.client.Get(context.TODO(), types.NamespacedName{Name: dr.Name, Namespace: dr.Namespace}, found)
-	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new DestinationRule", "DestinationRule.Namespace", dr.Namespace,
-			"DestinationRule.Name", dr.Name)
-		err = r.client.Create(context.TODO(), dr)
-		if err != nil {
-			return reconcile.Result{}, err
-		}
-
-		// DestinationRule created successfully - don't requeue
-		return reconcile.Result{}, nil
-	} else if err != nil {
-		reqLogger.Error(err, "Failed to get DestinationRule.")
-		return reconcile.Result{}, err
-	}
-	// DR already exists - don't requeue
-	reqLogger.Info("Skip reconcile: DestinationRule already exists", "DestinationRule.Namespace", found.Namespace,
-		"DestinationRule.Name", dr.Name)
 	return reconcile.Result{}, nil
 }
 
@@ -273,43 +215,6 @@ func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualServi
 			Http: []*networkingv1alpha3.HTTPRoute{
 				{
 					Route: backends,
-				},
-			},
-		},
-	}
-}
-
-// newDestinationRuleForCR returns DestinationRule with the same name & namespace as of the
-// Custom Resource
-func newDestinationRuleForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.DestinationRule {
-	labels := map[string]string{
-		"traffic-split": cr.Name,
-	}
-	return &networkingv1alpha3.DestinationRule{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-dr",
-			Namespace: cr.Namespace,
-			Labels:    labels,
-		},
-		Spec: networkingv1alpha3.DestinationRuleSpec{
-			Host: cr.Spec.Service,
-			TrafficPolicy: &networkingv1alpha3.TrafficPolicy{
-				Tls: &networkingv1alpha3.TLSSettings{
-					Mode: "ISTIO_MUTUAL",
-				},
-			},
-			Subsets: []*networkingv1alpha3.Subset{
-				{
-					Name: "v1",
-					Labels: map[string]string{
-						"version": "v1",
-					},
-				},
-				{
-					Name: "v2",
-					Labels: map[string]string{
-						"version": "v2",
-					},
 				},
 			},
 		},
