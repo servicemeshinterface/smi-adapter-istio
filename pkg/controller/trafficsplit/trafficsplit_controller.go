@@ -2,6 +2,7 @@ package trafficsplit
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -202,6 +203,10 @@ func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualServi
 		backends = append(backends, r)
 	}
 
+	gatewaysStr := cr.ObjectMeta.Annotations["VirtualService.v1alpha3.networking.istio.io/spec.gateways"]
+	var gateways []string
+	_ = json.Unmarshal([]byte(gatewaysStr), &gateways)
+
 	return &networkingv1alpha3.VirtualService{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cr.Name + "-vs",
@@ -210,7 +215,8 @@ func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualServi
 		},
 
 		Spec: networkingv1alpha3.VirtualServiceSpec{
-			Hosts: []string{cr.Spec.Service},
+			Hosts:    []string{cr.Spec.Service},
+			Gateways: gateways,
 
 			Http: []*networkingv1alpha3.HTTPRoute{
 				{

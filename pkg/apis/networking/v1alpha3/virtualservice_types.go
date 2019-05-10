@@ -32,8 +32,9 @@ type VirtualServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	Hosts []string     `json:"hosts,omitempty"`
-	Http  []*HTTPRoute `json:"http,omitempty"`
+	Hosts    []string     `json:"hosts,omitempty"`
+	Gateways []string     `json:"gateways,omitempty"`
+	Http     []*HTTPRoute `json:"http,omitempty"`
 }
 
 // VirtualServiceStatus defines the observed state of VirtualService

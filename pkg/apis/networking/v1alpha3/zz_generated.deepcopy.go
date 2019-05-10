@@ -141,6 +141,11 @@ func (in *VirtualServiceSpec) DeepCopyInto(out *VirtualServiceSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.Gateways != nil {
+		in, out := &in.Gateways, &out.Gateways
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.Http != nil {
 		in, out := &in.Http, &out.Http
 		*out = make([]*HTTPRoute, len(*in))
