@@ -18,10 +18,12 @@ make push
 
 ## How to install
 
+After installing Istio you can deploy the adapter in the `istio-system` namespace with:
+
 ```
-kubectl create -f deploy/service_account.yaml
-kubectl create -f deploy/role.yaml
-kubectl create -f deploy/role_binding.yaml
+kubectl apply -f deploy/crds/split_v1alpha1_trafficsplit_crd.yaml
+kubectl -n istio-system apply -f deploy/rbac.yaml
+
 cat deploy/operator.yaml | sed "s,OPERATOR_IMAGE,$OPERATOR_IMAGE,g" | kubectl create -f -
 ```
 
