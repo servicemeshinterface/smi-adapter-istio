@@ -1,5 +1,9 @@
 # smi-adapter-istio
 
+## Contributing
+
+Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing to the specification.
+
 ## How to build
 
 - Install the [Operator SDK CLI](https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md#install-the-operator-sdk-cli)
