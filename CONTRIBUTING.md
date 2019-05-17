@@ -12,3 +12,50 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 ## Code of Conduct
 This project has adopted the [Microsoft Open Source Code of conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact opencode@microsoft.com (mailto:opencode@microsoft.com) with any additional questions or comments.
+
+## Developer setup
+
+#### Prerequisites
+
+- Minikube machine with atleast `4GB` memory.
+- `operator-sdk` installed, download from [here](https://github.com/operator-framework/operator-sdk/releases).
+
+#### Download Istio
+
+Follow [instructions in istio documentation](https://istio.io/docs/setup/kubernetes/download/#download-and-prepare-for-the-installation) to download istio.
+
+#### Install Istio
+
+Once you are the root of the downloaded directory. Run following command to install Istio.
+
+```bash
+kubectl apply -f install/kubernetes/istio-demo-auth.yaml
+```
+
+Verify the istio is running fine as mentioned [here](https://istio.io/docs/setup/kubernetes/install/kubernetes/#verifying-the-installation).
+
+#### Now build the operator image
+
+```bash
+eval $(minikube docker-env)
+operator-sdk build devimage
+```
+
+By exporting all the minikube docker environment variables locally the build happens in the virtual machine directly.
+
+#### Deploy the operator and related configs
+
+```bash
+kubectl apply -R -f deploy/
+cat deploy/operator.yaml | sed 's|OPERATOR_IMAGE|devimage|g'| sed 's|imagePullPolicy: Always|imagePullPolicy: Never|g' | kubectl apply -f -
+```
+
+#### To rebuild and redeploy
+
+After making changes to the code run following commands
+
+```bash
+eval $(minikube docker-env)
+operator-sdk build devimage
+kubectl delete pod -l 'name=smi-adapter-istio'
+```
