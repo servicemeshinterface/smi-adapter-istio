@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	networkingv1alpha3 "github.com/deislabs/smi-adapter-istio/pkg/apis/networking/v1alpha3"
-	splitv1alpha1 "github.com/deislabs/smi-adapter-istio/pkg/apis/split/v1alpha1"
+	splitv1alpha1 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1"
 
 	"github.com/go-logr/logr"
 	"github.com/google/go-cmp/cmp"
@@ -162,14 +162,14 @@ func quantityToKilo(q resource.Quantity) int {
 func getIstioBackendPercentage(cr *splitv1alpha1.TrafficSplit, index int) int {
 	var totalWeight int
 	for _, b := range cr.Spec.Backends {
-		totalWeight += quantityToKilo(*b.Weight)
+		totalWeight += quantityToKilo(b.Weight)
 	}
 	if totalWeight == 0 {
 		return 0
 	}
 	var totalPercentage int
 	for i, b := range cr.Spec.Backends {
-		percentage := int(quantityToKilo(*b.Weight) * 100 / totalWeight)
+		percentage := int(quantityToKilo(b.Weight) * 100 / totalWeight)
 
 		// Make sure to round it correctly if we go over 100% or if we
 		// didn't reach 100% at the last entry.

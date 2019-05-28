@@ -101,6 +101,16 @@
   version = "v1.1.1"
 
 [[projects]]
+  digest = "1:499bf40e3c2c4000ce2292ccfd66f4b446c8396fc41d39022b0e412938555919"
+  name = "github.com/deislabs/smi-sdk-go"
+  packages = [
+    "pkg/apis/split",
+    "pkg/apis/split/v1alpha1",
+  ]
+  pruneopts = "NT"
+  revision = "8267b94f055287602a8c978b975c4d9e31c115e6"
+
+[[projects]]
   digest = "1:3a5601f7ac7fc10fc2a98039b18d83a767f3830141a08c19ae45c45244f43e57"
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
@@ -1097,6 +1107,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1",
     "github.com/go-logr/logr",
     "github.com/go-openapi/spec",
     "github.com/google/go-cmp/cmp",

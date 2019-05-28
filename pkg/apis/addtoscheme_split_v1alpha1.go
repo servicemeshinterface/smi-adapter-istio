@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"github.com/deislabs/smi-adapter-istio/pkg/apis/split/v1alpha1"
+	"github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1"
 )
 
 func init() {
