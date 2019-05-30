@@ -48,12 +48,15 @@ rules:
       - update
   - apiGroups:
       - split.smi-spec.io
+      - access.smi-spec.io
+      - specs.smi-spec.io
     resources:
       - '*'
     verbs:
       - '*'
   - apiGroups:
       - networking.istio.io
+      - rbac.istio.io
     resources:
       - '*'
     verbs:
