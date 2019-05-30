@@ -57,5 +57,5 @@ After making changes to the code run following commands
 ```bash
 eval $(minikube docker-env)
 operator-sdk build devimage
-kubectl delete pod -l 'name=smi-adapter-istio'
+kubectl -n istio-system delete pod -l 'name=smi-adapter-istio'
 ```
