@@ -1,0 +1,90 @@
+---
+apiVersion: specs.smi-spec.io/v1alpha1
+kind: HTTPRouteGroup
+metadata:
+  name: bookinfo-allowed-paths
+  namespace: default
+matches:
+- name: api
+  pathRegex: ""
+  methods: ["*"]
+---
+kind: TrafficTarget
+apiVersion: access.smi-spec.io/v1alpha1
+metadata:
+  name: productpage-reviews-v1
+  namespace: default
+destination:
+  kind: ServiceAccount
+  name: reviews-v1
+  namespace: default
+specs:
+- kind: HTTPRouteGroup
+  name: bookinfo-allowed-paths
+  matches:
+  - api
+sources:
+- kind: ServiceAccount
+  name: productpage-v1
+  namespace: default
+---
+kind: TrafficTarget
+apiVersion: access.smi-spec.io/v1alpha1
+metadata:
+  name: productpage-reviews-v3
+  namespace: default
+destination:
+  kind: ServiceAccount
+  name: reviews-v3
+  namespace: default
+specs:
+- kind: HTTPRouteGroup
+  name: bookinfo-allowed-paths
+  matches:
+  - api
+sources:
+- kind: ServiceAccount
+  name: productpage-v1
+  namespace: default
+---
+kind: TrafficTarget
+apiVersion: access.smi-spec.io/v1alpha1
+metadata:
+  name: productpage-details-v3
+  namespace: default
+destination:
+  kind: ServiceAccount
+  name: details-v1
+  namespace: default
+specs:
+- kind: HTTPRouteGroup
+  name: bookinfo-allowed-paths
+  matches:
+  - api
+sources:
+- kind: ServiceAccount
+  name: productpage-v1
+  namespace: default
+---
+kind: TrafficTarget
+apiVersion: access.smi-spec.io/v1alpha1
+metadata:
+  name: reviews-ratings
+  namespace: default
+destination:
+  kind: ServiceAccount
+  name: ratings-v1
+  namespace: default
+specs:
+- kind: HTTPRouteGroup
+  name: bookinfo-allowed-paths
+  matches:
+  - api
+sources:
+- kind: ServiceAccount
+  name: reviews-v2
+  namespace: default
+- kind: ServiceAccount
+  name: reviews-v3
+  namespace: default
+---
