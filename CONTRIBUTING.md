@@ -17,6 +17,10 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 This project has adopted the [Microsoft Open Source Code of conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact opencode@microsoft.com (mailto:opencode@microsoft.com) with any additional questions or comments.
 
+## Project Governance
+
+Project maintainership is outlined in the [GOVERNANCE](GOVERNANCE.md) file.
+
 ## Developer setup
 
 ### Prerequisites
