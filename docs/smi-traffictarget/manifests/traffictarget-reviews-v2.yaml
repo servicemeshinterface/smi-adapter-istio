@@ -1,0 +1,19 @@
+---
+kind: TrafficTarget
+apiVersion: access.smi-spec.io/v1alpha1
+metadata:
+  name: productpage-reviews-v2
+  namespace: default
+destination:
+  kind: ServiceAccount
+  name: reviews-v2
+  namespace: default
+specs:
+- kind: HTTPRouteGroup
+  name: bookinfo-allowed-paths
+  matches:
+  - api
+sources:
+- kind: ServiceAccount
+  name: productpage-v1
+  namespace: default
