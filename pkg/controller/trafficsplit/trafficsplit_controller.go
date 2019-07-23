@@ -3,6 +3,7 @@ package trafficsplit
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -78,6 +79,10 @@ type ReconcileTrafficSplit struct {
 func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	reqLogger.Info("Reconciling TrafficSplit")
+
+	if r.client == nil {
+		return reconcile.Result{}, fmt.Errorf("reconcile client is nil")
+	}
 
 	// Fetch the TrafficSplit instance
 	trafficSplit := &splitv1alpha1.TrafficSplit{}
