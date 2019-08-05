@@ -1,6 +1,17 @@
 # We don't have a default name yet.
 # OPERATOR_IMAGE ?= docker.io/servicemeshinterface/smi-adapter-istio
 
+
+#go options
+GO        ?= go
+GOFLAGS   :=
+PKG       := $(shell glide novendor)
+TESTS     := .
+TESTFLAGS :=
+
+# Required for globs to work correctly
+SHELL=/usr/bin/env bash
+
 .PHONY: build check-env
 build: check-env
 	operator-sdk build $(OPERATOR_IMAGE)
@@ -19,3 +30,12 @@ GOFORMAT_FILES := $(shell find . -name '*.go' | grep -v '\./vendor/')
 ## Formats any go file that differs from gofmt's style
 format-go-code:
 	@gofmt -s -l -w ${GOFORMAT_FILES}
+
+.PHONY: test
+test: test-unit
+
+.PHONY: test-unit
+test-unit:
+	@echo
+	@echo "==> Running unit tests <=="
+	$(GO) test $(GOFLAGS) -run $(TESTS) $(PKG) $(TESTFLAGS)
