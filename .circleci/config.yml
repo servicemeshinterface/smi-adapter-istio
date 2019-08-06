@@ -6,4 +6,5 @@ jobs:
     working_directory: /go/src/github.com/deislabs/smi-adapter-istio
     steps:
       - checkout
+      - run: make bootstrap
       - run: make test
