@@ -39,3 +39,11 @@ test-unit:
 	@echo
 	@echo "==> Running unit tests <=="
 	$(GO) test $(GOFLAGS) -run $(TESTS) $(PKG) $(TESTFLAGS)
+
+HAS_GLIDE := $(shell command -v glide;)
+
+.PHONY: bootstrap
+bootstrap:
+ifndef HAS_GLIDE
+	go get -u github.com/Masterminds/glide
+endif
