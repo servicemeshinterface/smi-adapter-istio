@@ -14,15 +14,16 @@ Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on con
 
 ## How to build
 
-- Install the [Operator SDK CLI](https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md#install-the-operator-sdk-cli)
-- Choose the container image name for the operator and build:
+1. Install the [Operator SDK CLI](https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md#install-the-operator-sdk-cli)
+2. Choose the container image name for the operator and build using the `make` command.
 
+Example:
 ```bash
 export OPERATOR_IMAGE=docker.io/servicemeshinterface/smi-adapter-istio:latest
 make
 ```
 
-- Push on your container registry:
+3 Push on your container registry:
 
 ```bash
 make push
