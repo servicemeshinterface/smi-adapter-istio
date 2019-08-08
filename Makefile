@@ -38,7 +38,7 @@ test: test-unit
 test-unit:
 	@echo
 	@echo "==> Running unit tests <=="
-	$(GO) test $(GOFLAGS) -run $(TESTS) $(PKG) $(TESTFLAGS)
+	$(GO) test $(GOFLAGS) -run $(TESTS) $(PKG) $(TESTFLAGS) -v
 
 HAS_GLIDE := $(shell command -v glide;)
 
