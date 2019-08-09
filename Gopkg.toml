@@ -76,3 +76,7 @@ required = [
   [[prune.project]]
     name = "k8s.io/gengo"
     non-go = false
+
+[[constraint]]
+  name = "github.com/evanphx/json-patch"
+  version = "4.5.0"
