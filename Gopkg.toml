@@ -64,7 +64,7 @@ required = [
 
 [[override]]
   name = "github.com/deislabs/smi-sdk-go"
-  revision = "86042c47396f92f00ad451a030b498bb033277b3"
+  revision = "9ef7916f8ab24a47f3862241aed24880613662a8"
 
 [prune]
   go-tests = true
