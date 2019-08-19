@@ -41,10 +41,14 @@ test-unit:
 	$(GO) test $(GOFLAGS) -run $(TESTS) $(PKG) $(TESTFLAGS) -v
 
 HAS_GLIDE := $(shell command -v glide;)
+HAS_DEP := $(shell command -v dep;)
 
 .PHONY: bootstrap
 bootstrap:
 ifndef HAS_GLIDE
 	go get -u github.com/Masterminds/glide
+endif
+ifndef HAS_DEP
+	go get -u github.com/golang/dep/cmd/dep
 endif
 	dep ensure
