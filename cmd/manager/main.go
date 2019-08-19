@@ -7,12 +7,6 @@ import (
 	"os"
 	"runtime"
 
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
-
-	"github.com/deislabs/smi-adapter-istio/pkg/apis"
-	"github.com/deislabs/smi-adapter-istio/pkg/controller"
-
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
@@ -20,10 +14,15 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/restmapper"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 	"github.com/spf13/pflag"
+	v1 "k8s.io/api/core/v1"
+	_ "k8s.io/client-go/plugin/pkg/client/auth" // Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/runtime/signals"
+
+	"github.com/deislabs/smi-adapter-istio/pkg/apis"
+	"github.com/deislabs/smi-adapter-istio/pkg/controller"
 )
 
 // Change below variables to serve metrics on different host or port.
@@ -110,7 +109,7 @@ func main() {
 	}
 
 	// Create Service object to expose the metrics port.
-	_, err = metrics.ExposeMetricsPort(ctx, metricsPort)
+	_, err = metrics.CreateMetricsService(ctx, cfg, []v1.ServicePort{v1.ServicePort{Port: metricsPort}})
 	if err != nil {
 		log.Info(err.Error())
 	}

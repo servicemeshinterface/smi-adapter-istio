@@ -31,7 +31,7 @@ kubectl apply -f install/kubernetes/istio-demo-auth.yaml
 cd $GOPATH/src/github.com/deislabs/smi-adapter-istio/docs/smi-trafficsplit
 kubectl apply -f deploy/crds/split_v1alpha1_trafficsplit_crd.yaml
 kubectl -n istio-system apply -f deploy/rbac.yaml
-export OPERATOR_IMAGE=docker.io/surajd/ipa:08ef365f73623364a60927a30a63f9595203e579
+export OPERATOR_IMAGE=docker.io/<your username>/smi-adapter-istio:latest
 cat deploy/operator.yaml | sed "s,OPERATOR_IMAGE,$OPERATOR_IMAGE,g" | kubectl apply -f -
 ```
 

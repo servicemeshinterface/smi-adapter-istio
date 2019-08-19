@@ -18,7 +18,7 @@ Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on con
 - Choose the container image name for the operator and build:
 
 ```bash
-export OPERATOR_IMAGE=docker.io/servicemeshinterface/smi-adapter-istio:latest
+export OPERATOR_IMAGE=docker.io/<your username>/smi-adapter-istio:latest
 make
 ```
 

@@ -47,3 +47,4 @@ bootstrap:
 ifndef HAS_GLIDE
 	go get -u github.com/Masterminds/glide
 endif
+	dep ensure
