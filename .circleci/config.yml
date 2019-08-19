@@ -1,10 +1,16 @@
 version: 2
 jobs:
-  build:
+  test:
     docker:
       - image: golang:1.12.7
     working_directory: /go/src/github.com/deislabs/smi-adapter-istio
+
     steps:
       - checkout
       - run: make bootstrap
       - run: make test
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - test
