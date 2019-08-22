@@ -18,7 +18,7 @@ spec:
       serviceAccountName: smi-adapter-istio
       containers:
         - name: smi-adapter-istio
-          image: quay.io/kinvolk/smi-adapter-istio:c7f8456
+          image: deislabs/smi-adapter-istio:latest
           command:
           - smi-adapter-istio
           imagePullPolicy: Always
