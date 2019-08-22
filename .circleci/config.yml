@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: golang:1.12
+      - image: circleci/golang:1.12
     working_directory: /go/src/github.com/deislabs/smi-adapter-istio
     steps:
       - checkout
@@ -11,7 +11,7 @@ jobs:
 
   build:
     docker:
-      - image: golang:1.12
+      - image: circleci/golang:1.12
     working_directory: /go/src/github.com/deislabs/smi-adapter-istio
     steps:
       - checkout
