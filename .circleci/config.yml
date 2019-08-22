@@ -21,7 +21,7 @@ jobs:
           name: build and push image
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS && \
-              make build push
+              make ci-build ci-push
 workflows:
   version: 2
   build-workflow:
