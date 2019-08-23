@@ -22,8 +22,9 @@ HAS_OPERATOR_SDK := $(shell command -v operator-sdk)
 ci-build:
 ifndef HAS_OPERATOR_SDK
 	# install linux release binary
-	curl -sL https://github.com/operator-framework/operator-sdk/releases/download/$\{OPERATOR_SDK_RELEASE_VERSION\}/operator-sdk-$\{OPERATOR_SDK_RELEASE_VERSION\}-x86_64-linux-gnu | sudo dd of=/usr/local/bin/operator-sdk
-	sudo chmod a+x /usr/local/bin/operator-sdk
+	curl -JL https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_RELEASE_VERSION}/operator-sdk-${OPERATOR_SDK_RELEASE_VERSION}-x86_64-linux-gnu > operator-sdk
+	sudo chmod a+x operator-sdk
+	sudo mv operator-sdk /usr/local/bin
 endif
 
 	operator-sdk build $(OPERATOR_IMAGE):$(OPERATOR_IMAGE_TAG)
