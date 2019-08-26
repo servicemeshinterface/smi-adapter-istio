@@ -8,7 +8,8 @@ Follow the [getting started section](https://github.com/deislabs/smi-adapter-ist
 - Istio installed on Kubernetes cluster
 - Deployed smi-istio-operator and related configs
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/kubernetes-manifests.yaml
+kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/crds/crds.yaml
+kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/operator-and-rbac.yaml
 ```
 
 ## Setup sample bookinfo application
