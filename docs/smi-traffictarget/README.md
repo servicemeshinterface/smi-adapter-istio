@@ -2,16 +2,13 @@
 
 This demo will show you how to use the [traffic spec](https://github.com/deislabs/smi-spec/blob/master/traffic-specs.md) and [traffic access control](https://github.com/deislabs/smi-spec/blob/master/traffic-access-control.md) specification
 
-## Prerequisite
+## Prerequisites
+Follow the [getting started section](https://github.com/deislabs/smi-adapter-istio#getting-started) to ensure you have the following:
+- A running Kubernetes cluster
+- Istio installed on Kubernetes cluster
+- Deployed smi-istio-operator and related configs
 
-A running Kubernetes cluster.
-
-## Setup
-
-* Deploy Istio
-
-Follow the instruction in the [doc here](https://istio.io/docs/setup/kubernetes/install/kubernetes/#installation-steps) to deploy Istio on Kubernetes.
-
+## Setup sample bookinfo application
 * Now deploy the sample bookinfo application
 
 ```bash
@@ -34,10 +31,6 @@ echo "http://$(kubectl -n istio-system get service istio-ingressgateway -o jsonp
 ```
 
 Above command extracts the public IP of the service `istio-ingressgateway` of type Load Balancer. And constructs the URL to reach the productpage.
-
-* Deploy the operator
-
-To deploy the operator and related configs refer the official [operator install docs](https://github.com/deislabs/smi-adapter-istio#how-to-install).
 
 * Deploy configs which are needed to provide access to frontend application *productpage*.
 
@@ -68,3 +61,10 @@ kubectl apply -f manifests/traffictarget-reviews-v2.yaml
 ```
 
 Now you can see that black colored stars also start appearing on the page. If you look at the config file [traffictarget-reviews-v2.yaml](manifests/traffictarget-reviews-v2.yaml) there productpage is allowed to talk to reviews-v2 service.
+
+## Cleanup
+Delete sample bookinfo application and all SMI TargetTarget related configuration:
+
+```console
+$ kubectl delete -f manifests/
+```
