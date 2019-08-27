@@ -32,7 +32,7 @@ $ kubectl apply -R -f deploy/
 ```
 4. Check that the operator has been deployed
 ```console
-$ kubectl get pods -n istio-system
+$ kubectl get pods -n istio-system -l name=smi-adapter-istio
 NAME                                      READY     STATUS      RESTARTS   AGE
 smi-adapter-istio-5ffcm8fqm               1/1       Running     0          20s
 ```

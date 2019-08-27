@@ -63,7 +63,7 @@ kubectl apply -f manifests/traffictarget-reviews-v2.yaml
 Now you can see that black colored stars also start appearing on the page. If you look at the config file [traffictarget-reviews-v2.yaml](manifests/traffictarget-reviews-v2.yaml) there productpage is allowed to talk to reviews-v2 service.
 
 ## Cleanup
-Delete sample bookinfo application and all SMI TargetTarget related configuration:
+Delete sample bookinfo application and all SMI TrafficTarget related configuration:
 
 ```console
 $ kubectl delete -f manifests/
