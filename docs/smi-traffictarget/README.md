@@ -7,6 +7,9 @@ Follow the [getting started section](https://github.com/deislabs/smi-adapter-ist
 - A running Kubernetes cluster
 - Istio installed on Kubernetes cluster
 - Deployed smi-istio-operator and related configs
+```bash
+kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/kubernetes-manifests.yaml
+```
 
 ## Setup sample bookinfo application
 * Now deploy the sample bookinfo application

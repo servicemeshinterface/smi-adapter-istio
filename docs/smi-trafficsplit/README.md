@@ -29,7 +29,7 @@ kubectl apply -f install/kubernetes/istio-demo-auth.yaml
 
 ```bash
 cd $GOPATH/src/github.com/deislabs/smi-adapter-istio/docs/smi-trafficsplit
-helm template ../../chart/ | kubectl apply -f -
+kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/kubernetes-manifests.yaml
 ```
 
 ## Demo

@@ -18,7 +18,7 @@ SMI defines a set of CRDs that allow for a common set of interfaces to build on 
 ### Install operator
 Install operator in Kubernetes cluster:
 ```bash
-$ helm template chart | kubectl apply -f -
+$ kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/kubernetes-manifests.yaml
 
 Check that the operator has been deployed:
 ```bash
