@@ -1,6 +1,6 @@
 # smi-adapter-istio
 
-This is a Kubernetes operator which implements the Service Mesh Interface(SMI) [Traffic Split](https://github.com/deislabs/smi-spec/blob/master/traffic-split.md), [Traffic Access Control](https://github.com/deislabs/smi-spec/blob/master/traffic-access-control.md) and [Traffic Specs](https://github.com/deislabs/smi-spec/blob/master/traffic-specs.md) APIs to work with Istio.
+This is a Kubernetes operator which implements the Service Mesh Interface(SMI) [Traffic Split](https://github.com/deislabs/smi-spec/blob/master/traffic-split.md), [Traffic Access Control](https://github.com/deislabs/smi-spec/blob/master/traffic-access-control.md) and [Traffic Specs](https://github.com/deislabs/smi-spec/blob/master/traffic-specs.md) APIs to work with Istio. The [Traffic Metrics](https://github.com/deislabs/smi-spec/blob/master/traffic-metrics.md) part of the SMI spec is implemented in the [smi-metrics](https://github.com/deislabs/smi-metrics) repo.
 
 Tools or humans may set up and use this operator after installing Istio to do things like:
 - orchestrate canary releases for new versions of software or more generally manage traffic shifting over time for applications
