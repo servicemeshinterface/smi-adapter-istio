@@ -16,22 +16,12 @@ SMI defines a set of CRDs that allow for a common set of interfaces to build on 
 - [Istio installed](https://istio.io/docs/setup/kubernetes/install/kubernetes/) on Kubernetes cluster
 
 ### Install operator
-1. Clone this repository in $GOPATH
-```console
-$ mkdir -p $GOPATH/src/github.com/deislabs/
-$ cd $GOPATH/src/github.com/deislabs
-$ git clone git@github.com:deislabs/smi-adapter-istio.git
-```
-2. cd into project directory
-```console
-$ cd $GOPATH/src/github.com/deislabs/smi-adapter-istio
-```
-3. Deploy this operator and all necessary CRDs in the `istio-system` namespace with:
-```console
-$ kubectl apply -R -f deploy/
-```
-4. Check that the operator has been deployed
-```console
+Install operator in Kubernetes cluster:
+```bash
+$ helm template chart | kubectl apply -f -
+
+Check that the operator has been deployed:
+```bash
 $ kubectl get pods -n istio-system -l name=smi-adapter-istio
 NAME                                      READY     STATUS      RESTARTS   AGE
 smi-adapter-istio-5ffcm8fqm               1/1       Running     0          20s

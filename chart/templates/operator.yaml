@@ -18,10 +18,10 @@ spec:
       serviceAccountName: smi-adapter-istio
       containers:
         - name: smi-adapter-istio
-          image: deislabs/smi-adapter-istio:latest
+          image: {{ .Values.image.name }}
           command:
           - smi-adapter-istio
-          imagePullPolicy: Always
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: WATCH_NAMESPACE
               value: ""
