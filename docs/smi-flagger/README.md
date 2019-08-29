@@ -29,10 +29,7 @@ kubectl apply -f install/kubernetes/istio-demo-auth.yaml
 
 ```bash
 cd $GOPATH/src/github.com/deislabs/smi-adapter-istio/docs/smi-flagger
-kubectl apply -f deploy/crds/split_v1alpha1_trafficsplit_crd.yaml
-kubectl -n istio-system apply -f deploy/rbac.yaml
-export OPERATOR_IMAGE=docker.io/surajd/ipa:08ef365f73623364a60927a30a63f9595203e579
-cat deploy/operator.yaml | sed "s,OPERATOR_IMAGE,$OPERATOR_IMAGE,g" | kubectl apply -f -
+kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/kubernetes-manifests.yaml
 ```
 
 ### Install Flagger
