@@ -34,7 +34,7 @@ smi-adapter-istio-5ffcm8fqm               1/1       Running     0          20s
 
 ## Contributing
 
-Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing to the specification.
+Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing to the specification and setting up your development environment.
 
 ## How to build
 
@@ -51,3 +51,5 @@ make
 ```bash
 make push
 ```
+
+More detailed instructions for developing against the operator can be found [here](CONTRIBUTING.md#Developing-Using-Tilt).

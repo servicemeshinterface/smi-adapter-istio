@@ -67,3 +67,10 @@ eval $(minikube docker-env)
 operator-sdk build devimage
 kubectl -n istio-system delete pod -l 'name=smi-adapter-istio'
 ```
+
+## Developing Using Tilt
+- Install [Tilt](https://docs.tilt.dev/install.html)
+- Replace `deislabs/smi-adapter-istio` in [manifest](deploy/kubernetes-manifests.yaml) and [Tiltfile](Tiltfile) with your own image name i.e. `<dockeruser>/smi-adapter-istio`
+- Run `$ tilt up` in project directory
+
+This will build and deploy the operator to Kubernetes and you can iterate and watch changes get updated in the cluster!
