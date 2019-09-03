@@ -24,51 +24,48 @@ Project maintainership is outlined in the [GOVERNANCE](GOVERNANCE.md) file.
 ## Developer setup
 
 ### Prerequisites
-
-- Minikube machine with atleast `4GB` memory.
+- Running Kubernetes cluster (If using Minikube, Minikube machine with atleast `4GB` memory).
 - `operator-sdk` installed, download from [here](https://github.com/operator-framework/operator-sdk/releases).
-
-### Download Istio
-
-Follow [instructions in istio documentation](https://istio.io/docs/setup/kubernetes/download/#download-and-prepare-for-the-installation) to download istio.
-
-### Install Istio
-
-Once you are the root of the downloaded directory. Run following command to install Istio.
-
+- Follow [instructions in istio documentation](https://istio.io/docs/setup/kubernetes/download/#download-and-prepare-for-the-installation) to download istio. Once you are the root of the downloaded directory. Run following command to install Istio.
 ```bash
 kubectl apply -f install/kubernetes/istio-demo-auth.yaml
 ```
-
 Verify the istio is running fine as mentioned [here](https://istio.io/docs/setup/kubernetes/install/kubernetes/#verifying-the-installation).
 
-### Now build the operator image
+### Build Operator Image
 
+#### If using Minikube, use the following instructions:
 ```bash
 eval $(minikube docker-env)
 operator-sdk build devimage
 ```
-
 By exporting all the minikube docker environment variables locally the build happens in the virtual machine directly.
 
-### Deploy the operator and related configs
-
+Deploy image using:
 ```bash
 kubectl apply -R -f deploy/
-cat deploy/operator.yaml | sed 's|OPERATOR_IMAGE|devimage|g'| sed 's|imagePullPolicy: Always|imagePullPolicy: Never|g' | kubectl apply -f -
+cat deploy/kubernetes-manifests.yaml | sed 's|deislabs/smi-adapter-istio:latest|devimage|g'| sed 's|imagePullPolicy: Always|imagePullPolicy: Never|g' | kubectl apply -f -
 ```
 
-### To rebuild and redeploy
-
-After making changes to the code run following commands
-
+To rebuild and redeploy after making changes to the code, run the following commands:
 ```bash
 eval $(minikube docker-env)
 operator-sdk build devimage
 kubectl -n istio-system delete pod -l 'name=smi-adapter-istio'
 ```
+## Build and Push Operator Image
+If you're not using Minikube, you'll want to build and push the image to a remote container registry. Choose the container image name for the operator and build:
+```bash
+export OPERATOR_IMAGE=docker.io/<your username>/smi-adapter-istio:latest
+make
+```
 
-## Developing Using Tilt
+Push to your container registry:
+```bash
+make push
+```
+
+### Developing Using Tilt
 - Install [Tilt](https://docs.tilt.dev/install.html)
 - Replace `deislabs/smi-adapter-istio` in [manifest](deploy/kubernetes-manifests.yaml) and [Tiltfile](Tiltfile) with your own image name i.e. `<dockeruser>/smi-adapter-istio`
 - Run `$ tilt up` in project directory

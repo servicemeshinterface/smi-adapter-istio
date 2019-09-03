@@ -36,20 +36,6 @@ smi-adapter-istio-5ffcm8fqm               1/1       Running     0          20s
 
 Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing to this repository and setting up your development environment.
 
-## How to build
-
-- Install the [Operator SDK CLI](https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md#install-the-operator-sdk-cli)
-- Choose the container image name for the operator and build:
-
-```bash
-export OPERATOR_IMAGE=docker.io/<your username>/smi-adapter-istio:latest
-make
-```
-
-- Push on your container registry:
-
-```bash
-make push
-```
+Find information for building and pushing your own operator image [here](CONTRIBUTING.md#build-and-push-operator-image).
 
 More detailed instructions for developing against the operator can be found [here](CONTRIBUTING.md#Developing-Using-Tilt).
