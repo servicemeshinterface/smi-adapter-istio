@@ -37,6 +37,7 @@ ci-push:
 .PHONY: build check-env
 build: check-env
 	operator-sdk build $(OPERATOR_IMAGE):$(OPERATOR_IMAGE_TAG)
+	docker tag $(OPERATOR_IMAGE):$(OPERATOR_IMAGE_TAG) $(OPERATOR_IMAGE):$(GIT_COMMIT)
 
 push:
 	docker push $(OPERATOR_IMAGE):$(OPERATOR_IMAGE_TAG)
