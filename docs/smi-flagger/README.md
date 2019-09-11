@@ -25,11 +25,12 @@ kubectl apply -f install/kubernetes/istio-demo-auth.yaml
 
 **NOTE**: Above apply might sometimes give errors like `unable to recognize "install/kubernetes/istio-demo-auth.yaml": no matches for kind "DestinationRule" in version "networking.istio.io/v1alpha3"`, this is most likely because the CRDs are not registered yet and apiserver will reconcile it. Try running the above `kubectl apply ...` again.
 
-### Install SMI Operator for Istio
+### Install SMI CRDs and Operator to work with Istio
 
 ```bash
 cd $GOPATH/src/github.com/deislabs/smi-adapter-istio/docs/smi-flagger
-kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/kubernetes-manifests.yaml
+kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/crds/crds.yaml
+kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/operator-and-rbac.yaml
 ```
 
 ### Install Flagger

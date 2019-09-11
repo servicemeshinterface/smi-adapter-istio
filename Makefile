@@ -5,7 +5,6 @@ OPERATOR_IMAGE_TAG ?= latest
 #go options
 GO        ?= go
 GOFLAGS   :=
-PKG       := $(shell glide novendor)
 TESTS     := .
 TESTFLAGS :=
 
@@ -14,7 +13,6 @@ SHELL=/usr/bin/env bash
 
 GIT_COMMIT  ?= $(shell git rev-parse --short HEAD)
 
-HAS_GLIDE := $(shell command -v glide;)
 HAS_DEP := $(shell command -v dep;)
 HAS_OPERATOR_SDK := $(shell command -v operator-sdk)
 
@@ -62,13 +60,13 @@ test: test-unit
 test-unit:
 	@echo
 	@echo "==> Running unit tests <=="
-	$(GO) test $(GOFLAGS) -run $(TESTS) $(PKG) $(TESTFLAGS) -v
+	$(GO) test $(GOFLAGS) -run $(TESTS) ./cmd/... ./pkg/... $(TESTFLAGS) -v
+
+test-e2e:
+	operator-sdk test local ./test/e2e --namespaced-manifest deploy/kubernetes-manifests.yaml --namespace istio-system
 
 .PHONY: bootstrap
 bootstrap:
-ifndef HAS_GLIDE
-	go get -u github.com/Masterminds/glide
-endif
 ifndef HAS_DEP
 	go get -u github.com/golang/dep/cmd/dep
 endif
