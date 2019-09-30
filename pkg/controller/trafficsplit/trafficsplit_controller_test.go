@@ -7,6 +7,7 @@ import (
 	splitv1alpha1 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	apitypes "k8s.io/apimachinery/pkg/types"
@@ -103,6 +104,68 @@ func TestReconcile(t *testing.T) {
 		virtualServiceObj)
 	if err != nil {
 		t.Errorf("Expected virtual service object to be created successfully, but was not: %s", err)
+	}
+}
+
+func TestWeightToPercent(t *testing.T) {
+	backends := []splitv1alpha1.TrafficSplitBackend{
+		splitv1alpha1.TrafficSplitBackend{Service: "a", Weight: *resource.NewQuantity(1000, resource.BinarySI)},
+		splitv1alpha1.TrafficSplitBackend{Service: "b", Weight: *resource.NewQuantity(2000, resource.BinarySI)},
+	}
+	weights := weightToPercent(backends)
+	if weights["a"] != 33 {
+		t.Errorf("Expected Service a to have percent weight of 33 but got %v", weights["a"])
+	}
+	if weights["b"] != 67 {
+		t.Errorf("Expected Service b to have percent weight of 67 but got %v", weights["b"])
+	}
+
+	backends = []splitv1alpha1.TrafficSplitBackend{
+		splitv1alpha1.TrafficSplitBackend{Service: "a", Weight: *resource.NewQuantity(1000, resource.BinarySI)},
+		splitv1alpha1.TrafficSplitBackend{Service: "b", Weight: *resource.NewQuantity(1000, resource.BinarySI)},
+		splitv1alpha1.TrafficSplitBackend{Service: "c", Weight: *resource.NewQuantity(1000, resource.BinarySI)},
+	}
+	weights = weightToPercent(backends)
+	if weights["a"] != 33 {
+		t.Errorf("Expected Service a to have percent weight of 33 but got %v", weights["a"])
+	}
+	if weights["b"] != 33 {
+		t.Errorf("Expected Service b to have percent weight of 33 but got %v", weights["b"])
+	}
+	if weights["c"] != 34 {
+		t.Errorf("Expected Service b to have percent weight of 34 but got %v", weights["c"])
+	}
+
+	backends = []splitv1alpha1.TrafficSplitBackend{
+		splitv1alpha1.TrafficSplitBackend{Service: "a", Weight: *resource.NewQuantity(20, resource.BinarySI)},
+		splitv1alpha1.TrafficSplitBackend{Service: "b", Weight: *resource.NewQuantity(30, resource.BinarySI)},
+		splitv1alpha1.TrafficSplitBackend{Service: "c", Weight: *resource.NewQuantity(50, resource.BinarySI)},
+	}
+	weights = weightToPercent(backends)
+	if weights["a"] != 20 {
+		t.Errorf("Expected Service a to have percent weight of 20 but got %v", weights["a"])
+	}
+	if weights["b"] != 30 {
+		t.Errorf("Expected Service b to have percent weight of 30 but got %v", weights["b"])
+	}
+	if weights["c"] != 50 {
+		t.Errorf("Expected Service b to have percent weight of 50 but got %v", weights["c"])
+	}
+
+	backends = []splitv1alpha1.TrafficSplitBackend{
+		splitv1alpha1.TrafficSplitBackend{Service: "a", Weight: *resource.NewQuantity(5, resource.BinarySI)},
+		splitv1alpha1.TrafficSplitBackend{Service: "b", Weight: *resource.NewQuantity(10, resource.BinarySI)},
+		splitv1alpha1.TrafficSplitBackend{Service: "c", Weight: *resource.NewQuantity(20, resource.BinarySI)},
+	}
+	weights = weightToPercent(backends)
+	if weights["a"] != 14 {
+		t.Errorf("Expected Service a to have percent weight of 14 but got %v", weights["a"])
+	}
+	if weights["b"] != 29 {
+		t.Errorf("Expected Service b to have percent weight of 29 but got %v", weights["b"])
+	}
+	if weights["c"] != 57 {
+		t.Errorf("Expected Service b to have percent weight of 57 but got %v", weights["c"])
 	}
 }
 

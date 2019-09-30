@@ -3,14 +3,12 @@ package trafficsplit
 import (
 	"context"
 	"encoding/json"
-	"strconv"
-	"strings"
+	"math"
 
 	splitv1alpha1 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1"
 	"github.com/go-logr/logr"
 	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -144,46 +142,35 @@ func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alp
 	return reconcile.Result{}, nil
 }
 
-func quantityToKilo(q resource.Quantity) int {
-	// TODO: reuse existing resource.Quantity methods to get the amount
-	numberBytes, suffixBytes := q.CanonicalizeBytes(make([]byte, 18, 18))
-	number := strings.Trim(string(numberBytes), "\000")
-	suffix := strings.Trim(string(suffixBytes), "\000")
-	out, _ := strconv.Atoi(number)
-	if suffix == "m" {
-		return out
-	} else if suffix == "" {
-		return out * 1000
-	} else {
-		return 0
+//weightToPercent takes TrafficSplitBackends and maps a service to a weight
+//  in the form of an integer from 1 - 100. The sum of weights must be 100. The last service
+//  will be adjusted so that the total weight of the map returned at the end is equal to 100.
+func weightToPercent(backends []splitv1alpha1.TrafficSplitBackend) map[string]int {
+	weights := map[string]int{}
+	totalWeight := 0
+	for _, b := range backends {
+		weightAsInt, _ := b.Weight.AsInt64()
+		totalWeight = totalWeight + int(weightAsInt)
+		weights[b.Service] = 0
 	}
-}
 
-func getIstioBackendPercentage(cr *splitv1alpha1.TrafficSplit, index int) int {
-	var totalWeight int
-	for _, b := range cr.Spec.Backends {
-		totalWeight += quantityToKilo(b.Weight)
-	}
 	if totalWeight == 0 {
-		return 0
+		return weights
 	}
-	var totalPercentage int
-	for i, b := range cr.Spec.Backends {
-		percentage := int(quantityToKilo(b.Weight) * 100 / totalWeight)
 
-		// Make sure to round it correctly if we go over 100% or if we
-		// didn't reach 100% at the last entry.
-		if totalPercentage+percentage > 100 || i == len(cr.Spec.Backends)-1 {
-			percentage = 100 - totalPercentage
+	totalPercent := 0
+	for i, b := range backends {
+		weightAsInt, _ := b.Weight.AsInt64()
+		w := (float64(weightAsInt) / float64(totalWeight)) * 100
+		per := math.Round(float64(w))
+		percent := int(per)
+		if i == len(backends)-1 {
+			percent = 100 - totalPercent
 		}
-
-		if i == index {
-			return percentage
-		}
-
-		totalPercentage += percentage
+		weights[b.Service] = percent
+		totalPercent = totalPercent + percent
 	}
-	return 0
+	return weights
 }
 
 // newVSForCR returns a VirtualService with the same name/namespace as the cr
@@ -193,11 +180,12 @@ func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualServi
 	}
 
 	var backends []*networkingv1alpha3.HTTPRouteDestination
+	weights := weightToPercent(cr.Spec.Backends)
 
-	for i, b := range cr.Spec.Backends {
+	for _, b := range cr.Spec.Backends {
 		r := &networkingv1alpha3.HTTPRouteDestination{
 			Destination: &networkingv1alpha3.Destination{Host: b.Service},
-			Weight:      int32(getIstioBackendPercentage(cr, i)),
+			Weight:      int32(weights[b.Service]),
 		}
 
 		backends = append(backends, r)

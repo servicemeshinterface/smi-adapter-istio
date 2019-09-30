@@ -8,4 +8,4 @@ spec:
   - service: reviews-v1
     weight: 1
   - service: reviews-v2
-    weight: 500m
+    weight: 500
