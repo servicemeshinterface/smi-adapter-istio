@@ -1,5 +1,5 @@
 # Deploy: tell Tilt what YAML to deploy
-k8s_yaml('deploy/kubernetes-manifests.yaml')
+k8s_yaml('deploy/operator-and-rbac.yaml')
 
 custom_build(
   'deislabs/smi-adapter-istio',
