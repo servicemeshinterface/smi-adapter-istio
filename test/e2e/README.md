@@ -14,5 +14,5 @@ $ kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/
 ```bash
 $ cd $GOPATH/src/github.com/deislabs/smi-adapter-istio/
 
-$ operator-sdk test local ./test/e2e --namespaced-manifest test/testdata/operator-and-rbac.yaml --namespace istio-system
+$ operator-sdk test local ./test/e2e --namespaced-manifest deploy/operator-and-rbac.yaml --namespace istio-system
 ```

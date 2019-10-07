@@ -4,10 +4,9 @@ import (
 	"context"
 	"testing"
 
-	splitv1alpha1 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1"
+	splitv1alpha2 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha2"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	apitypes "k8s.io/apimachinery/pkg/types"
@@ -32,17 +31,17 @@ func TestNewReconciler(t *testing.T) {
 }
 
 func TestReconcile_ErrorIsNotFound(t *testing.T) {
-	trafficSplitObj := &splitv1alpha1.TrafficSplit{
+	trafficSplitObj := &splitv1alpha2.TrafficSplit{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "traffic-split-name",
 			Namespace: "default",
 		},
-		Spec: splitv1alpha1.TrafficSplitSpec{},
+		Spec: splitv1alpha2.TrafficSplitSpec{},
 	}
 	objs := []runtime.Object{}
 	cl := fake.NewFakeClient(objs...)
 	s := scheme.Scheme
-	s.AddKnownTypes(splitv1alpha1.SchemeGroupVersion, trafficSplitObj)
+	s.AddKnownTypes(splitv1alpha2.SchemeGroupVersion, trafficSplitObj)
 	reconcileTrafficSplit := &ReconcileTrafficSplit{client: cl, scheme: s}
 	req := reconcile.Request{NamespacedName: apitypes.NamespacedName{
 		Namespace: "default",
@@ -55,12 +54,12 @@ func TestReconcile_ErrorIsNotFound(t *testing.T) {
 }
 
 func TestReconcile(t *testing.T) {
-	trafficSplitObj := &splitv1alpha1.TrafficSplit{
+	trafficSplitObj := &splitv1alpha2.TrafficSplit{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "traffic-split-name",
 			Namespace: "default",
 		},
-		Spec: splitv1alpha1.TrafficSplitSpec{},
+		Spec: splitv1alpha2.TrafficSplitSpec{},
 	}
 	virtualServiceObj := &networkingv1alpha3.VirtualService{
 		ObjectMeta: metav1.ObjectMeta{
@@ -75,7 +74,7 @@ func TestReconcile(t *testing.T) {
 		trafficSplitObj,
 	}
 	s := scheme.Scheme
-	s.AddKnownTypes(splitv1alpha1.SchemeGroupVersion, trafficSplitObj)
+	s.AddKnownTypes(splitv1alpha2.SchemeGroupVersion, trafficSplitObj)
 	s.AddKnownTypes(networkingv1alpha3.SchemeGroupVersion, virtualServiceObj)
 
 	cl := fake.NewFakeClient(objs...)
@@ -108,9 +107,9 @@ func TestReconcile(t *testing.T) {
 }
 
 func TestWeightToPercent(t *testing.T) {
-	backends := []splitv1alpha1.TrafficSplitBackend{
-		splitv1alpha1.TrafficSplitBackend{Service: "a", Weight: *resource.NewQuantity(1000, resource.BinarySI)},
-		splitv1alpha1.TrafficSplitBackend{Service: "b", Weight: *resource.NewQuantity(2000, resource.BinarySI)},
+	backends := []splitv1alpha2.TrafficSplitBackend{
+		splitv1alpha2.TrafficSplitBackend{Service: "a", Weight: 1000},
+		splitv1alpha2.TrafficSplitBackend{Service: "b", Weight: 2000},
 	}
 	weights := weightToPercent(backends)
 	if weights["a"] != 33 {
@@ -120,10 +119,10 @@ func TestWeightToPercent(t *testing.T) {
 		t.Errorf("Expected Service b to have percent weight of 67 but got %v", weights["b"])
 	}
 
-	backends = []splitv1alpha1.TrafficSplitBackend{
-		splitv1alpha1.TrafficSplitBackend{Service: "a", Weight: *resource.NewQuantity(1000, resource.BinarySI)},
-		splitv1alpha1.TrafficSplitBackend{Service: "b", Weight: *resource.NewQuantity(1000, resource.BinarySI)},
-		splitv1alpha1.TrafficSplitBackend{Service: "c", Weight: *resource.NewQuantity(1000, resource.BinarySI)},
+	backends = []splitv1alpha2.TrafficSplitBackend{
+		splitv1alpha2.TrafficSplitBackend{Service: "a", Weight: 1000},
+		splitv1alpha2.TrafficSplitBackend{Service: "b", Weight: 1000},
+		splitv1alpha2.TrafficSplitBackend{Service: "c", Weight: 1000},
 	}
 	weights = weightToPercent(backends)
 	if weights["a"] != 33 {
@@ -136,10 +135,10 @@ func TestWeightToPercent(t *testing.T) {
 		t.Errorf("Expected Service b to have percent weight of 34 but got %v", weights["c"])
 	}
 
-	backends = []splitv1alpha1.TrafficSplitBackend{
-		splitv1alpha1.TrafficSplitBackend{Service: "a", Weight: *resource.NewQuantity(20, resource.BinarySI)},
-		splitv1alpha1.TrafficSplitBackend{Service: "b", Weight: *resource.NewQuantity(30, resource.BinarySI)},
-		splitv1alpha1.TrafficSplitBackend{Service: "c", Weight: *resource.NewQuantity(50, resource.BinarySI)},
+	backends = []splitv1alpha2.TrafficSplitBackend{
+		splitv1alpha2.TrafficSplitBackend{Service: "a", Weight: 20},
+		splitv1alpha2.TrafficSplitBackend{Service: "b", Weight: 30},
+		splitv1alpha2.TrafficSplitBackend{Service: "c", Weight: 50},
 	}
 	weights = weightToPercent(backends)
 	if weights["a"] != 20 {
@@ -152,10 +151,10 @@ func TestWeightToPercent(t *testing.T) {
 		t.Errorf("Expected Service b to have percent weight of 50 but got %v", weights["c"])
 	}
 
-	backends = []splitv1alpha1.TrafficSplitBackend{
-		splitv1alpha1.TrafficSplitBackend{Service: "a", Weight: *resource.NewQuantity(5, resource.BinarySI)},
-		splitv1alpha1.TrafficSplitBackend{Service: "b", Weight: *resource.NewQuantity(10, resource.BinarySI)},
-		splitv1alpha1.TrafficSplitBackend{Service: "c", Weight: *resource.NewQuantity(20, resource.BinarySI)},
+	backends = []splitv1alpha2.TrafficSplitBackend{
+		splitv1alpha2.TrafficSplitBackend{Service: "a", Weight: 5},
+		splitv1alpha2.TrafficSplitBackend{Service: "b", Weight: 10},
+		splitv1alpha2.TrafficSplitBackend{Service: "c", Weight: 20},
 	}
 	weights = weightToPercent(backends)
 	if weights["a"] != 14 {

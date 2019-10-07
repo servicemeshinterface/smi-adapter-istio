@@ -62,9 +62,9 @@ required = [
   #branch = "master" #osdk_branch_annotation
   version = "=v0.10.0" #osdk_version_annotation
 
-[[override]]
+[[constraint]]
   name = "github.com/deislabs/smi-sdk-go"
-  version = "=v0.1.0"
+  version = "v0.2.0"
 
 [prune]
   go-tests = true

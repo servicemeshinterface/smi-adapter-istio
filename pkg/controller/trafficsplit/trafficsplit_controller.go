@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"math"
 
-	splitv1alpha1 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1"
+	splitv1alpha2 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha2"
 	"github.com/go-logr/logr"
 	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -46,7 +46,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to primary resource TrafficSplit
-	err = c.Watch(&source.Kind{Type: &splitv1alpha1.TrafficSplit{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &splitv1alpha2.TrafficSplit{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource VirtualService
 	return c.Watch(&source.Kind{Type: &networkingv1alpha3.VirtualService{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &splitv1alpha1.TrafficSplit{},
+		OwnerType:    &splitv1alpha2.TrafficSplit{},
 	})
 }
 
@@ -78,7 +78,7 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 	reqLogger.Info("Reconciling TrafficSplit")
 
 	// Fetch the TrafficSplit instance
-	trafficSplit := &splitv1alpha1.TrafficSplit{}
+	trafficSplit := &splitv1alpha2.TrafficSplit{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, trafficSplit)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -96,7 +96,7 @@ func (r *ReconcileTrafficSplit) Reconcile(request reconcile.Request) (reconcile.
 	return r.reconcileVirtualService(trafficSplit, reqLogger)
 }
 
-func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alpha1.TrafficSplit,
+func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alpha2.TrafficSplit,
 	reqLogger logr.Logger) (reconcile.Result, error) {
 	// Define a new VirtualService object
 	vs := newVSForCR(trafficSplit)
@@ -145,12 +145,11 @@ func (r *ReconcileTrafficSplit) reconcileVirtualService(trafficSplit *splitv1alp
 //weightToPercent takes TrafficSplitBackends and maps a service to a weight
 //  in the form of an integer from 1 - 100. The sum of weights must be 100. The last service
 //  will be adjusted so that the total weight of the map returned at the end is equal to 100.
-func weightToPercent(backends []splitv1alpha1.TrafficSplitBackend) map[string]int {
+func weightToPercent(backends []splitv1alpha2.TrafficSplitBackend) map[string]int {
 	weights := map[string]int{}
 	totalWeight := 0
 	for _, b := range backends {
-		weightAsInt, _ := b.Weight.AsInt64()
-		totalWeight = totalWeight + int(weightAsInt)
+		totalWeight = totalWeight + int(b.Weight)
 		weights[b.Service] = 0
 	}
 
@@ -160,8 +159,7 @@ func weightToPercent(backends []splitv1alpha1.TrafficSplitBackend) map[string]in
 
 	totalPercent := 0
 	for i, b := range backends {
-		weightAsInt, _ := b.Weight.AsInt64()
-		w := (float64(weightAsInt) / float64(totalWeight)) * 100
+		w := (float64(b.Weight) / float64(totalWeight)) * 100
 		per := math.Round(float64(w))
 		percent := int(per)
 		if i == len(backends)-1 {
@@ -174,7 +172,7 @@ func weightToPercent(backends []splitv1alpha1.TrafficSplitBackend) map[string]in
 }
 
 // newVSForCR returns a VirtualService with the same name/namespace as the cr
-func newVSForCR(cr *splitv1alpha1.TrafficSplit) *networkingv1alpha3.VirtualService {
+func newVSForCR(cr *splitv1alpha2.TrafficSplit) *networkingv1alpha3.VirtualService {
 	labels := map[string]string{
 		"traffic-split": cr.Name,
 	}

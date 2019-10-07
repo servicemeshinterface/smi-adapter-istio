@@ -109,7 +109,7 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:c7debe27d1c00cb7b32bdd25a1ff1e11963453e341abd88e8d6f8c652704d222"
+  digest = "1:3df785fa7a025eb95754b52fdc91a7ad7e11d020ac4f455649abbf5803463ceb"
   name = "github.com/deislabs/smi-sdk-go"
   packages = [
     "pkg/apis/access",
@@ -117,11 +117,11 @@
     "pkg/apis/specs",
     "pkg/apis/specs/v1alpha1",
     "pkg/apis/split",
-    "pkg/apis/split/v1alpha1",
+    "pkg/apis/split/v1alpha2",
   ]
   pruneopts = "NT"
-  revision = "af08faf7b9c26861fcd4a313c954e71f3ed30bc2"
-  version = "v0.1.0"
+  revision = "ad2d568b61aaccd07b3f4fa5a48bbf5662ef18c0"
+  version = "v0.2.0"
 
 [[projects]]
   digest = "1:3a5601f7ac7fc10fc2a98039b18d83a767f3830141a08c19ae45c45244f43e57"
@@ -1187,7 +1187,7 @@
   input-imports = [
     "github.com/deislabs/smi-sdk-go/pkg/apis/access/v1alpha1",
     "github.com/deislabs/smi-sdk-go/pkg/apis/specs/v1alpha1",
-    "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1",
+    "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha2",
     "github.com/go-logr/logr",
     "github.com/go-openapi/spec",
     "github.com/google/go-cmp/cmp",
@@ -1203,7 +1203,6 @@
     "k8s.io/api/core/v1",
     "k8s.io/apimachinery/pkg/api/errors",
     "k8s.io/apimachinery/pkg/api/meta",
-    "k8s.io/apimachinery/pkg/api/resource",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/runtime/schema",
