@@ -6,6 +6,6 @@ spec:
   service: reviews
   backends:
   - service: reviews-v1
-    weight: "200m"
+    weight: 200
   - service: reviews-v2
-    weight: "800m"
+    weight: 800

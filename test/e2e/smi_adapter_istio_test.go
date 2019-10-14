@@ -6,11 +6,10 @@ import (
 	"testing"
 	"time"
 
-	splitv1alpha1 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha1"
+	splitv1alpha2 "github.com/deislabs/smi-sdk-go/pkg/apis/split/v1alpha2"
 	framework "github.com/operator-framework/operator-sdk/pkg/test"
 	"github.com/operator-framework/operator-sdk/pkg/test/e2eutil"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -29,7 +28,7 @@ var (
 // deploy operator, create traffic split, verify virtualservice was created
 func TestTrafficSplit(t *testing.T) {
 
-	tsList := &splitv1alpha1.TrafficSplitList{}
+	tsList := &splitv1alpha2.TrafficSplitList{}
 	err := framework.AddToFrameworkScheme(apis.AddToScheme, tsList)
 	if err != nil {
 		t.Fatalf("failed to add custom resource scheme to framework: %v", err)
@@ -81,29 +80,27 @@ func TrafficSplitCreateTest(t *testing.T, f *framework.Framework, ctx *framework
 	if err != nil {
 		return fmt.Errorf("could not get namespace: %v", err)
 	}
-	w1 := resource.NewQuantity(1, resource.DecimalSI)
-	w2 := resource.NewQuantity(0, resource.DecimalSI)
 
 	// create custom resource
-	trafficSplit := &splitv1alpha1.TrafficSplit{
+	trafficSplit := &splitv1alpha2.TrafficSplit{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "TrafficSplit",
-			APIVersion: "split.smi-spec.io/v1alpha1",
+			APIVersion: "split.smi-spec.io/v1alpha2",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "test-service-rollout",
 			Namespace: namespace,
 		},
-		Spec: splitv1alpha1.TrafficSplitSpec{
+		Spec: splitv1alpha2.TrafficSplitSpec{
 			Service: "test-service",
-			Backends: []splitv1alpha1.TrafficSplitBackend{
-				splitv1alpha1.TrafficSplitBackend{
+			Backends: []splitv1alpha2.TrafficSplitBackend{
+				splitv1alpha2.TrafficSplitBackend{
 					Service: "test-service-v1",
-					Weight:  *w1,
+					Weight:  1,
 				},
-				splitv1alpha1.TrafficSplitBackend{
+				splitv1alpha2.TrafficSplitBackend{
 					Service: "test-service-v2",
-					Weight:  *w2,
+					Weight:  0,
 				},
 			},
 		},
