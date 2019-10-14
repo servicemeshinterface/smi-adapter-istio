@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	rbacv1alpha1 "github.com/deislabs/smi-adapter-istio/pkg/apis/rbac/v1alpha1"
 	accessv1alpha1 "github.com/deislabs/smi-sdk-go/pkg/apis/access/v1alpha1"
 	specsv1alpha1 "github.com/deislabs/smi-sdk-go/pkg/apis/specs/v1alpha1"
-
 	"github.com/go-logr/logr"
 	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -22,6 +20,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	rbacv1alpha1 "github.com/deislabs/smi-adapter-istio/pkg/apis/rbac/v1alpha1"
 )
 
 var log = logf.Log.WithName("controller_traffictarget")
@@ -108,10 +108,7 @@ func (r *ReconcileTrafficTarget) Reconcile(
 	return r.reconcileTrafficTarget(trafficTarget, reqLogger)
 }
 
-func (r *ReconcileTrafficTarget) reconcileTrafficTarget(
-	trafficTarget *accessv1alpha1.TrafficTarget,
-	reqLogger logr.Logger,
-) (reconcile.Result, error) {
+func (r *ReconcileTrafficTarget) reconcileTrafficTarget(trafficTarget *accessv1alpha1.TrafficTarget, reqLogger logr.Logger) (reconcile.Result, error) {
 
 	svcRole, svcRoleBinding, err := r.createRBAC(trafficTarget)
 	if err != nil {
@@ -241,16 +238,13 @@ func (r *ReconcileTrafficTarget) createServiceRoleBinding(
 // createRBAC creates a ServiceRole and ServiceRoleBinding for each
 // TrafficTarget. For all the HTTPRouteGroup objects referred in the
 // TrafficTarget will also be queried.
-func (r *ReconcileTrafficTarget) createRBAC(
-	trafficTarget *accessv1alpha1.TrafficTarget,
-) (*rbacv1alpha1.ServiceRole, *rbacv1alpha1.ServiceRoleBinding, error) {
+func (r *ReconcileTrafficTarget) createRBAC(trafficTarget *accessv1alpha1.TrafficTarget) (*rbacv1alpha1.ServiceRole, *rbacv1alpha1.ServiceRoleBinding, error) {
 	var subjects []*rbacv1alpha1.Subject
 	for _, src := range trafficTarget.Sources {
 		// TODO:
 		// Remove the hardcoded value of `cluster.local`
 		subjects = append(subjects, &rbacv1alpha1.Subject{
-			User: fmt.Sprintf("cluster.local/ns/%s/sa/%s",
-				src.Namespace, src.Name),
+			User: fmt.Sprintf("cluster.local/ns/%s/sa/%s", src.Namespace, src.Name),
 		})
 	}
 	// same set of constraints generated from a TrafficTarget apply to all the
