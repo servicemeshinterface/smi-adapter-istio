@@ -1,6 +1,6 @@
-# Maintainers: @slack @lachie83 @michelleN
-CODEOWNERS @slack @lachie83 @michelleN
-CONTRIBUTING.md @slack @lachie83 @michelleN
-LICENSE @slack @lachie83 @michelleN
-GOVERNANCE.md @slack @lachie83 @michelleN
+# Maintainers: @slack @lachie83 @michelleN @rickducott
+CODEOWNERS @slack @lachie83 @michelleN @rickducott
+CONTRIBUTING.md @slack @lachie83 @michelleN @rickducott
+LICENSE @slack @lachie83 @michelleN @rickducott
+GOVERNANCE.md @slack @lachie83 @michelleN @rickducott
 # EMERITUS Maintainers: @alban @surajssd @stefanprodan
