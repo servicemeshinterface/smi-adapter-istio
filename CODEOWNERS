@@ -1,5 +1,6 @@
-# Maintainers: @alban @surajssd @slack @stefanprodan @lachie83 @michelleN
-CODEOWNERS @alban @surajssd @slack @stefanprodan @lachie83 @michelleN
-CONTRIBUTING.md @alban @surajssd @slack @stefanprodan @lachie83 @michelleN
-LICENSE @alban @surajssd @slack @stefanprodan @lachie83 @michelleN
-GOVERNANCE.md @alban @surajssd @slack @stefanprodan @lachie83 @michelleN
+# Maintainers: @slack @lachie83 @michelleN
+CODEOWNERS @slack @lachie83 @michelleN
+CONTRIBUTING.md @slack @lachie83 @michelleN
+LICENSE @slack @lachie83 @michelleN
+GOVERNANCE.md @slack @lachie83 @michelleN
+# EMERITUS Maintainers: @alban @surajssd @stefanprodan
