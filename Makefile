@@ -8,6 +8,18 @@ GOFLAGS   :=
 TESTS     := .
 TESTFLAGS :=
 
+KIND_VERSION=v0.5.1
+HOST_OS := $(shell uname -s)
+ifeq ($(HOST_OS), Darwin)
+OS_ARCH = darwin-amd64
+else
+ifeq ($(HOST_OS), Linux)
+OS_ARCH = linux-amd64
+else
+$(error Unsupported Host OS)
+endif
+endif
+
 # Required for globs to work correctly
 SHELL=/usr/bin/env bash
 
@@ -15,6 +27,9 @@ GIT_COMMIT  ?= $(shell git rev-parse --short HEAD)
 
 HAS_DEP := $(shell command -v dep;)
 HAS_OPERATOR_SDK := $(shell command -v operator-sdk)
+HAS_KIND := $(shell command -v kind)
+
+KIND_KUBECONFIG = $(shell kind get kubeconfig-path --name=local-kind)
 
 .PHONY: ci-build
 ci-build:
@@ -63,7 +78,8 @@ test-unit:
 	$(GO) test $(GOFLAGS) -run $(TESTS) ./cmd/... ./pkg/... $(TESTFLAGS) -v
 
 test-e2e:
-	operator-sdk test local ./test/e2e --namespaced-manifest deploy/kubernetes-manifests.yaml --namespace istio-system
+	KUBECONFIG=$(KIND_KUBECONFIG) \
+		operator-sdk test local ./test/e2e --namespaced-manifest deploy/operator-and-rbac.yaml --namespace istio-system
 
 .PHONY: bootstrap
 bootstrap:
@@ -71,3 +87,26 @@ ifndef HAS_DEP
 	go get -u github.com/golang/dep/cmd/dep
 endif
 	dep ensure
+
+create-kindcluster:
+ifndef HAS_KIND
+	@echo "installing kind"
+	@curl -fsSLo kind "https://github.com/kubernetes-sigs/kind/releases/download/$(KIND_VERSION)/kind-$(OS_ARCH)"
+	@chmod +x kind
+	@mv kind /usr/local/bin/kind
+endif
+	kind create cluster --name local-kind  --image kindest/node:v1.15.3
+
+install-istio:
+	curl -fsSL https://git.io/getLatestIstio | ISTIO_VERSION=1.1.6 sh -
+	ls istio-1.1.6/install/kubernetes/helm/istio-init/files/crd*yaml | \
+		xargs -I{} kubectl apply -f {} --kubeconfig=$(KIND_KUBECONFIG)
+	kubectl apply -f istio-1.1.6/install/kubernetes/istio-demo-auth.yaml \
+		--kubeconfig=$(KIND_KUBECONFIG)
+
+install-smi-crds:
+	kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/crds/crds.yaml \
+		--kubeconfig=$(KIND_KUBECONFIG)
+
+clean-kind:
+	kind delete cluster --name local-kind
