@@ -15,6 +15,7 @@ jobs:
     working_directory: /go/src/github.com/deislabs/smi-adapter-istio
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: build and push image
           command: |
