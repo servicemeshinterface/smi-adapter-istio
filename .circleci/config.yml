@@ -15,8 +15,6 @@ jobs:
     working_directory: /go/src/github.com/deislabs/smi-adapter-istio
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
       - run:
           name: build and push image
           command: |
