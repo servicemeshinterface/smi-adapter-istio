@@ -1,5 +1,5 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
   name: reviews
@@ -7,6 +7,10 @@ metadata:
     app: reviews
     version: v1
 spec:
+  selector:
+    matchLabels:
+      app: reviews
+      version: v1
   replicas: 2
   strategy:
     type: RollingUpdate
