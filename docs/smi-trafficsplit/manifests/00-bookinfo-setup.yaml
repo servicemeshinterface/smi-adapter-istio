@@ -15,7 +15,7 @@ spec:
   selector:
     app: details
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: details-v1
@@ -23,6 +23,10 @@ metadata:
     app: details
     version: v1
 spec:
+  selector:
+    matchLabels:
+      app: details
+      version: v1
   replicas: 1
   template:
     metadata:
@@ -54,7 +58,7 @@ spec:
   selector:
     app: ratings
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ratings-v1
@@ -62,6 +66,10 @@ metadata:
     app: ratings
     version: v1
 spec:
+  selector:
+    matchLabels:
+      app: ratings 
+      version: v1
   replicas: 1
   template:
     metadata:
@@ -93,7 +101,7 @@ spec:
   selector:
     app: productpage
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: productpage-v1
@@ -101,6 +109,10 @@ metadata:
     app: productpage
     version: v1
 spec:
+  selector:
+    matchLabels:
+      app: productpage
+      version: v1 
   replicas: 1
   template:
     metadata:
@@ -141,7 +153,8 @@ metadata:
   name: bookinfo-gateway
 spec:
   selector:
-    istio: ingressgateway # use istio default controller
+    #istio: ingressgateway # use istio default controller
+    app: citrix-ingressgateway # use istio default controller
   servers:
   - port:
       number: 80
