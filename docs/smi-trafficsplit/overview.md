@@ -1,6 +1,6 @@
 # Overview
 
-The SMI Istio Adapter implements the SMI Traffic Split API as dictated by the [SMI spec](https://github.com/deislabs/smi-spec/blob/master/traffic-split.md).
+The SMI Istio Adapter implements the SMI Traffic Split API as dictated by the [SMI spec](https://github.com/servicemeshinterface/smi-spec/blob/master/traffic-split.md).
 
 See example TrafficSplit resource below:
 ```yaml

@@ -105,7 +105,7 @@ install-istio:
 		--kubeconfig=$(KIND_KUBECONFIG)
 
 install-smi-crds:
-	kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/crds/crds.yaml \
+	kubectl apply -f https://raw.githubusercontent.com/servicemeshinterface/smi-adapter-istio/master/deploy/crds/crds.yaml \
 		--kubeconfig=$(KIND_KUBECONFIG)
 
 clean-kind:

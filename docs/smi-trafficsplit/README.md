@@ -28,9 +28,9 @@ kubectl apply -f install/kubernetes/istio-demo-auth.yaml
 ### Install SMI CRDs and Operator to work with Istio
 
 ```bash
-cd $GOPATH/src/github.com/deislabs/smi-adapter-istio/docs/smi-trafficsplit
-kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/crds/crds.yaml
-kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/operator-and-rbac.yaml
+cd $GOPATH/src/github.com/servicemeshinterface/smi-adapter-istio/docs/smi-trafficsplit
+kubectl apply -f https://raw.githubusercontent.com/servicemeshinterface/smi-adapter-istio/master/deploy/crds/crds.yaml
+kubectl apply -f https://raw.githubusercontent.com/servicemeshinterface/smi-adapter-istio/master/deploy/operator-and-rbac.yaml
 ```
 
 ## Demo
