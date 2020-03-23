@@ -1,15 +1,15 @@
 # Traffic Target
 
-This demo will show you how to use the [traffic spec](https://github.com/deislabs/smi-spec/blob/master/traffic-specs.md) and [traffic access control](https://github.com/deislabs/smi-spec/blob/master/traffic-access-control.md) specification
+This demo will show you how to use the [traffic spec](https://github.com/servicemeshinterface/smi-spec/blob/master/traffic-specs.md) and [traffic access control](https://github.com/servicemeshinterface/smi-spec/blob/master/traffic-access-control.md) specification
 
 ## Prerequisites
-Follow the [getting started section](https://github.com/deislabs/smi-adapter-istio#getting-started) to ensure you have the following:
+Follow the [getting started section](https://github.com/servicemeshinterface/smi-adapter-istio#getting-started) to ensure you have the following:
 - A running Kubernetes cluster
 - Istio installed on Kubernetes cluster
 - Deployed smi-istio-operator and related configs
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/crds/crds.yaml
-kubectl apply -f https://raw.githubusercontent.com/deislabs/smi-adapter-istio/master/deploy/operator-and-rbac.yaml
+kubectl apply -f https://raw.githubusercontent.com/servicemeshinterface/smi-adapter-istio/master/deploy/crds/crds.yaml
+kubectl apply -f https://raw.githubusercontent.com/servicemeshinterface/smi-adapter-istio/master/deploy/operator-and-rbac.yaml
 ```
 
 ## Setup sample bookinfo application
