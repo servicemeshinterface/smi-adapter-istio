@@ -20,7 +20,7 @@ kind: ServiceAccount
 metadata:
   name: details-v1
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
   name: details-v1
@@ -28,6 +28,10 @@ metadata:
     app: details
     version: v1
 spec:
+  selector:
+    matchLabels:
+      app: details
+      version: v1
   replicas: 1
   template:
     metadata:
@@ -66,7 +70,7 @@ kind: ServiceAccount
 metadata:
   name: ratings-v1
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
   name: ratings-v1
@@ -74,6 +78,10 @@ metadata:
     app: ratings
     version: v1
 spec:
+  selector:
+    matchLabels:
+      app: ratings
+      version: v1
   replicas: 1
   template:
     metadata:
@@ -111,7 +119,7 @@ kind: ServiceAccount
 metadata:
   name: reviews-v1
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
   name: reviews-v1
@@ -119,6 +127,10 @@ metadata:
     app: reviews
     version: v1
 spec:
+  selector:
+    matchLabels:
+      app: reviews
+      version: v1
   replicas: 1
   template:
     metadata:
@@ -139,7 +151,7 @@ kind: ServiceAccount
 metadata:
   name: reviews-v2
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
   name: reviews-v2
@@ -147,6 +159,10 @@ metadata:
     app: reviews
     version: v2
 spec:
+  selector:
+    matchLabels:
+      app: reviews
+      version: v2
   replicas: 1
   template:
     metadata:
@@ -167,7 +183,7 @@ kind: ServiceAccount
 metadata:
   name: reviews-v3
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
   name: reviews-v3
@@ -175,6 +191,10 @@ metadata:
     app: reviews
     version: v3
 spec:
+  selector:
+    matchLabels:
+      app: reviews
+      version: v3
   replicas: 1
   template:
     metadata:
@@ -212,7 +232,7 @@ kind: ServiceAccount
 metadata:
   name: productpage-v1
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1 
 kind: Deployment
 metadata:
   name: productpage-v1
@@ -220,6 +240,10 @@ metadata:
     app: productpage
     version: v1
 spec:
+  selector:
+    matchLabels:
+      app: productpage
+      version: v1
   replicas: 1
   template:
     metadata:
