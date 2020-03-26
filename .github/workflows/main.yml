@@ -27,7 +27,7 @@ jobs:
         echo ${GOBIN}
     - name: Build and test
       run: |
-        export PATH=$PATH:$(go env GOPATH)/bin
+        GOBIN=$PWD/bin
         make bootstrap
         make test
   build:
