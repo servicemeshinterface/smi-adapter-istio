@@ -23,7 +23,6 @@ jobs:
         make test
   build:
     name: Container build
-    needs: docker_build
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
