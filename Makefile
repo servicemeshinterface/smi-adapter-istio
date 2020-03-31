@@ -1,4 +1,4 @@
-OPERATOR_IMAGE ?= docker.io/deislabs/smi-adapter-istio
+OPERATOR_IMAGE ?= docker.io/servicemeshinterface/smi-adapter-istio
 OPERATOR_SDK_RELEASE_VERSION ?= v0.9.0
 OPERATOR_IMAGE_TAG ?= latest
 
